@@ -17,8 +17,8 @@ void Vmac_tb___024root___eval_initial(Vmac_tb___024root* vlSelf) {
     Vmac_tb___024root___eval_initial__TOP__Vtiming__1(vlSelf);
     vlSelf->__Vtrigprevexpr___TOP__mac_tb__DOT__clk__0 
         = vlSelf->mac_tb__DOT__clk;
-    vlSelf->__Vtrigprevexpr___TOP__mac_tb__DOT__reset__0 
-        = vlSelf->mac_tb__DOT__reset;
+    vlSelf->__Vtrigprevexpr___TOP__mac_tb__DOT__nrst__0 
+        = vlSelf->mac_tb__DOT__nrst;
 }
 
 VL_INLINE_OPT VlCoroutine Vmac_tb___024root___eval_initial__TOP__Vtiming__1(Vmac_tb___024root* vlSelf) {
@@ -29,8 +29,9 @@ VL_INLINE_OPT VlCoroutine Vmac_tb___024root___eval_initial__TOP__Vtiming__1(Vmac
     while (1U) {
         co_await vlSelf->__VdlySched.delay(5ULL, nullptr, 
                                            "source/mac_tb.sv", 
-                                           14);
-        vlSelf->mac_tb__DOT__clk = (1U & (~ (IData)(vlSelf->mac_tb__DOT__clk)));
+                                           13);
+        vlSelf->mac_tb__DOT__clk = (1U & ((IData)(1U) 
+                                          + (IData)(vlSelf->mac_tb__DOT__clk)));
     }
 }
 
@@ -45,12 +46,12 @@ VL_INLINE_OPT void Vmac_tb___024root___nba_sequent__TOP__0(Vmac_tb___024root* vl
     Vmac_tb__Syms* const __restrict vlSymsp VL_ATTR_UNUSED = vlSelf->vlSymsp;
     VL_DEBUG_IF(VL_DBG_MSGF("+    Vmac_tb___024root___nba_sequent__TOP__0\n"); );
     // Body
-    vlSelf->mac_tb__DOT__cout = ((IData)(vlSelf->mac_tb__DOT__reset)
-                                  ? 0U : (0xfU & ((IData)(vlSelf->mac_tb__DOT__cin) 
-                                                  * 
-                                                  (0xfU 
-                                                   & ((IData)(vlSelf->mac_tb__DOT__a) 
-                                                      + (IData)(vlSelf->mac_tb__DOT__b))))));
+    vlSelf->mac_tb__DOT__cout = ((IData)(vlSelf->mac_tb__DOT__nrst)
+                                  ? (0xffU & ((IData)(vlSelf->mac_tb__DOT__cin) 
+                                              * (0xffU 
+                                                 & ((IData)(vlSelf->mac_tb__DOT__a) 
+                                                    + (IData)(vlSelf->mac_tb__DOT__b)))))
+                                  : 0U);
 }
 
 void Vmac_tb___024root___eval_nba(Vmac_tb___024root* vlSelf) {
@@ -68,8 +69,21 @@ void Vmac_tb___024root___timing_resume(Vmac_tb___024root* vlSelf) {
     Vmac_tb__Syms* const __restrict vlSymsp VL_ATTR_UNUSED = vlSelf->vlSymsp;
     VL_DEBUG_IF(VL_DBG_MSGF("+    Vmac_tb___024root___timing_resume\n"); );
     // Body
+    if ((4ULL & vlSelf->__VactTriggered.word(0U))) {
+        vlSelf->__VtrigSched_h41009cb5__0.resume("@(posedge mac_tb.clk)");
+    }
     if ((2ULL & vlSelf->__VactTriggered.word(0U))) {
         vlSelf->__VdlySched.resume();
+    }
+}
+
+void Vmac_tb___024root___timing_commit(Vmac_tb___024root* vlSelf) {
+    (void)vlSelf;  // Prevent unused variable warning
+    Vmac_tb__Syms* const __restrict vlSymsp VL_ATTR_UNUSED = vlSelf->vlSymsp;
+    VL_DEBUG_IF(VL_DBG_MSGF("+    Vmac_tb___024root___timing_commit\n"); );
+    // Body
+    if ((! (4ULL & vlSelf->__VactTriggered.word(0U)))) {
+        vlSelf->__VtrigSched_h41009cb5__0.commit("@(posedge mac_tb.clk)");
     }
 }
 
@@ -80,10 +94,11 @@ bool Vmac_tb___024root___eval_phase__act(Vmac_tb___024root* vlSelf) {
     Vmac_tb__Syms* const __restrict vlSymsp VL_ATTR_UNUSED = vlSelf->vlSymsp;
     VL_DEBUG_IF(VL_DBG_MSGF("+    Vmac_tb___024root___eval_phase__act\n"); );
     // Init
-    VlTriggerVec<2> __VpreTriggered;
+    VlTriggerVec<3> __VpreTriggered;
     CData/*0:0*/ __VactExecute;
     // Body
     Vmac_tb___024root___eval_triggers__act(vlSelf);
+    Vmac_tb___024root___timing_commit(vlSelf);
     __VactExecute = vlSelf->__VactTriggered.any();
     if (__VactExecute) {
         __VpreTriggered.andNot(vlSelf->__VactTriggered, vlSelf->__VnbaTriggered);

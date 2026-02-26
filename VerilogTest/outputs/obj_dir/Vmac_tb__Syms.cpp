@@ -43,7 +43,7 @@ Vmac_tb__Syms::Vmac_tb__Syms(VerilatedContext* contextp, const char* namep, Vmac
     , TOP{this, namep}
 {
         // Check resources
-        Verilated::stackCheck(27);
+        Verilated::stackCheck(42);
     // Configure time unit / time precision
     _vm_contextp__->timeunit(-9);
     _vm_contextp__->timeprecision(-9);

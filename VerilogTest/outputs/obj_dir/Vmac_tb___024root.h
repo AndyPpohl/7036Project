@@ -16,18 +16,19 @@ class alignas(VL_CACHE_LINE_BYTES) Vmac_tb___024root final : public VerilatedMod
 
     // DESIGN SPECIFIC STATE
     CData/*0:0*/ mac_tb__DOT__clk;
-    CData/*0:0*/ mac_tb__DOT__reset;
-    CData/*3:0*/ mac_tb__DOT__a;
-    CData/*3:0*/ mac_tb__DOT__b;
-    CData/*3:0*/ mac_tb__DOT__cin;
-    CData/*3:0*/ mac_tb__DOT__cout;
+    CData/*0:0*/ mac_tb__DOT__nrst;
+    CData/*7:0*/ mac_tb__DOT__a;
+    CData/*7:0*/ mac_tb__DOT__b;
+    CData/*7:0*/ mac_tb__DOT__cin;
+    CData/*7:0*/ mac_tb__DOT__cout;
     CData/*0:0*/ __Vtrigprevexpr___TOP__mac_tb__DOT__clk__0;
-    CData/*0:0*/ __Vtrigprevexpr___TOP__mac_tb__DOT__reset__0;
+    CData/*0:0*/ __Vtrigprevexpr___TOP__mac_tb__DOT__nrst__0;
     CData/*0:0*/ __VactContinue;
     IData/*31:0*/ __VactIterCount;
     VlDelayScheduler __VdlySched;
-    VlTriggerVec<2> __VactTriggered;
-    VlTriggerVec<2> __VnbaTriggered;
+    VlTriggerScheduler __VtrigSched_h41009cb5__0;
+    VlTriggerVec<3> __VactTriggered;
+    VlTriggerVec<3> __VnbaTriggered;
 
     // INTERNAL VARIABLES
     Vmac_tb__Syms* const vlSymsp;

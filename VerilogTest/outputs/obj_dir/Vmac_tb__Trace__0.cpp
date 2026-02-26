@@ -24,11 +24,11 @@ void Vmac_tb___024root__trace_chg_0_sub_0(Vmac_tb___024root* vlSelf, VerilatedVc
     uint32_t* const oldp VL_ATTR_UNUSED = bufp->oldp(vlSymsp->__Vm_baseCode + 1);
     // Body
     bufp->chgBit(oldp+0,(vlSelf->mac_tb__DOT__clk));
-    bufp->chgBit(oldp+1,(vlSelf->mac_tb__DOT__reset));
-    bufp->chgCData(oldp+2,(vlSelf->mac_tb__DOT__a),4);
-    bufp->chgCData(oldp+3,(vlSelf->mac_tb__DOT__b),4);
-    bufp->chgCData(oldp+4,(vlSelf->mac_tb__DOT__cin),4);
-    bufp->chgCData(oldp+5,(vlSelf->mac_tb__DOT__cout),4);
+    bufp->chgBit(oldp+1,(vlSelf->mac_tb__DOT__nrst));
+    bufp->chgCData(oldp+2,(vlSelf->mac_tb__DOT__a),8);
+    bufp->chgCData(oldp+3,(vlSelf->mac_tb__DOT__b),8);
+    bufp->chgCData(oldp+4,(vlSelf->mac_tb__DOT__cin),8);
+    bufp->chgCData(oldp+5,(vlSelf->mac_tb__DOT__cout),8);
 }
 
 void Vmac_tb___024root__trace_cleanup(void* voidSelf, VerilatedVcd* /*unused*/) {
