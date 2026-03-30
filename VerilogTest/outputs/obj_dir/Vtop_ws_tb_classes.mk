@@ -2,7 +2,7 @@
 # DESCRIPTION: Verilator output: Make include file with class lists
 #
 # This file lists generated Verilated files, for including in higher level makefiles.
-# See Vmac_array_tb.mk for the caller.
+# See Vtop_ws_tb.mk for the caller.
 
 ### Switches...
 # C11 constructs required?  0/1 (always on now)
@@ -23,26 +23,27 @@ VM_TRACE_FST = 0
 ### Object file lists...
 # Generated module classes, fast-path, compile with highest optimization
 VM_CLASSES_FAST += \
-	Vmac_array_tb \
-	Vmac_array_tb___024root__DepSet_h3a2e7879__0 \
-	Vmac_array_tb___024root__DepSet_haae02c87__0 \
-	Vmac_array_tb__main \
+	Vtop_ws_tb \
+	Vtop_ws_tb___024root__DepSet_h6ec4cfcb__0 \
+	Vtop_ws_tb___024root__DepSet_h3adf68a7__0 \
+	Vtop_ws_tb__main \
 
 # Generated module classes, non-fast-path, compile with low/medium optimization
 VM_CLASSES_SLOW += \
-	Vmac_array_tb___024root__Slow \
-	Vmac_array_tb___024root__DepSet_h3a2e7879__0__Slow \
-	Vmac_array_tb___024root__DepSet_haae02c87__0__Slow \
+	Vtop_ws_tb__ConstPool_0 \
+	Vtop_ws_tb___024root__Slow \
+	Vtop_ws_tb___024root__DepSet_h6ec4cfcb__0__Slow \
+	Vtop_ws_tb___024root__DepSet_h3adf68a7__0__Slow \
 
 # Generated support classes, fast-path, compile with highest optimization
 VM_SUPPORT_FAST += \
-	Vmac_array_tb__Trace__0 \
+	Vtop_ws_tb__Trace__0 \
 
 # Generated support classes, non-fast-path, compile with low/medium optimization
 VM_SUPPORT_SLOW += \
-	Vmac_array_tb__Syms \
-	Vmac_array_tb__Trace__0__Slow \
-	Vmac_array_tb__TraceDecls__0__Slow \
+	Vtop_ws_tb__Syms \
+	Vtop_ws_tb__Trace__0__Slow \
+	Vtop_ws_tb__TraceDecls__0__Slow \
 
 # Global classes, need linked once per executable, fast-path, compile with highest optimization
 VM_GLOBAL_FAST += \

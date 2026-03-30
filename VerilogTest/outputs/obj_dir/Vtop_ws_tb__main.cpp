@@ -2,7 +2,7 @@
 // DESCRIPTION: main() calling loop, created with Verilator --main
 
 #include "verilated.h"
-#include "Vmac_array_tb.h"
+#include "Vtop_ws_tb.h"
 
 //======================
 
@@ -14,7 +14,7 @@ int main(int argc, char** argv, char**) {
     contextp->commandArgs(argc, argv);
 
     // Construct the Verilated model, from Vtop.h generated from Verilating
-    const std::unique_ptr<Vmac_array_tb> topp{new Vmac_array_tb{contextp.get()}};
+    const std::unique_ptr<Vtop_ws_tb> topp{new Vtop_ws_tb{contextp.get()}};
 
     // Simulate until $finish
     while (!contextp->gotFinish()) {

@@ -4,24 +4,24 @@
 // Internal details; most calling programs do not need this header,
 // unless using verilator public meta comments.
 
-#ifndef VERILATED_VMAC_ARRAY_TB__SYMS_H_
-#define VERILATED_VMAC_ARRAY_TB__SYMS_H_  // guard
+#ifndef VERILATED_VTOP_WS_TB__SYMS_H_
+#define VERILATED_VTOP_WS_TB__SYMS_H_  // guard
 
 #include "verilated.h"
 #include "verilated_vcd_c.h"
 
 // INCLUDE MODEL CLASS
 
-#include "Vmac_array_tb.h"
+#include "Vtop_ws_tb.h"
 
 // INCLUDE MODULE CLASSES
-#include "Vmac_array_tb___024root.h"
+#include "Vtop_ws_tb___024root.h"
 
 // SYMS CLASS (contains all model state)
-class alignas(VL_CACHE_LINE_BYTES)Vmac_array_tb__Syms final : public VerilatedSyms {
+class alignas(VL_CACHE_LINE_BYTES)Vtop_ws_tb__Syms final : public VerilatedSyms {
   public:
     // INTERNAL STATE
-    Vmac_array_tb* const __Vm_modelp;
+    Vtop_ws_tb* const __Vm_modelp;
     bool __Vm_dumping = false;  // Dumping is active
     VerilatedMutex __Vm_dumperMutex;  // Protect __Vm_dumperp
     VerilatedVcdC* __Vm_dumperp VL_GUARDED_BY(__Vm_dumperMutex) = nullptr;  /// Trace class for $dump*
@@ -31,11 +31,11 @@ class alignas(VL_CACHE_LINE_BYTES)Vmac_array_tb__Syms final : public VerilatedSy
     bool __Vm_didInit = false;
 
     // MODULE INSTANCE STATE
-    Vmac_array_tb___024root        TOP;
+    Vtop_ws_tb___024root           TOP;
 
     // CONSTRUCTORS
-    Vmac_array_tb__Syms(VerilatedContext* contextp, const char* namep, Vmac_array_tb* modelp);
-    ~Vmac_array_tb__Syms();
+    Vtop_ws_tb__Syms(VerilatedContext* contextp, const char* namep, Vtop_ws_tb* modelp);
+    ~Vtop_ws_tb__Syms();
 
     // METHODS
     const char* name() { return TOP.name(); }

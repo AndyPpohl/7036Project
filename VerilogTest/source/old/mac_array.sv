@@ -1,3 +1,4 @@
+/*
 `timescale 1ns/1ns
 
 module mac_array 
@@ -131,3 +132,4 @@ module mac_array
     end
 
 endmodule
+*/

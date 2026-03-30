@@ -1,3 +1,4 @@
+/*
 `timescale 1ns/1ns
 
 module mac #(
@@ -54,3 +55,4 @@ module mac #(
     end
 
 endmodule 
+*/

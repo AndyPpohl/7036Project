@@ -5,20 +5,20 @@
 // The class here is then constructed to instantiate the design.
 // See the Verilator manual for examples.
 
-#ifndef VERILATED_VMAC_ARRAY_TB_H_
-#define VERILATED_VMAC_ARRAY_TB_H_  // guard
+#ifndef VERILATED_VTOP_WS_TB_H_
+#define VERILATED_VTOP_WS_TB_H_  // guard
 
 #include "verilated.h"
 
-class Vmac_array_tb__Syms;
-class Vmac_array_tb___024root;
+class Vtop_ws_tb__Syms;
+class Vtop_ws_tb___024root;
 class VerilatedVcdC;
 
 // This class is the main interface to the Verilated model
-class alignas(VL_CACHE_LINE_BYTES) Vmac_array_tb VL_NOT_FINAL : public VerilatedModel {
+class alignas(VL_CACHE_LINE_BYTES) Vtop_ws_tb VL_NOT_FINAL : public VerilatedModel {
   private:
     // Symbol table holding complete model state (owned by this class)
-    Vmac_array_tb__Syms* const vlSymsp;
+    Vtop_ws_tb__Syms* const vlSymsp;
 
   public:
 
@@ -32,19 +32,19 @@ class alignas(VL_CACHE_LINE_BYTES) Vmac_array_tb VL_NOT_FINAL : public Verilated
 
     // Root instance pointer to allow access to model internals,
     // including inlined /* verilator public_flat_* */ items.
-    Vmac_array_tb___024root* const rootp;
+    Vtop_ws_tb___024root* const rootp;
 
     // CONSTRUCTORS
     /// Construct the model; called by application code
     /// If contextp is null, then the model will use the default global context
     /// If name is "", then makes a wrapper with a
     /// single model invisible with respect to DPI scope names.
-    explicit Vmac_array_tb(VerilatedContext* contextp, const char* name = "TOP");
-    explicit Vmac_array_tb(const char* name = "TOP");
+    explicit Vtop_ws_tb(VerilatedContext* contextp, const char* name = "TOP");
+    explicit Vtop_ws_tb(const char* name = "TOP");
     /// Destroy the model; called (often implicitly) by application code
-    virtual ~Vmac_array_tb();
+    virtual ~Vtop_ws_tb();
   private:
-    VL_UNCOPYABLE(Vmac_array_tb);  ///< Copying not allowed
+    VL_UNCOPYABLE(Vtop_ws_tb);  ///< Copying not allowed
 
   public:
     // API METHODS

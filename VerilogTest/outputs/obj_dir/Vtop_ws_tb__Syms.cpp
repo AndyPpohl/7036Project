@@ -1,24 +1,24 @@
 // Verilated -*- C++ -*-
 // DESCRIPTION: Verilator output: Symbol table implementation internals
 
-#include "Vmac_array_tb__pch.h"
-#include "Vmac_array_tb.h"
-#include "Vmac_array_tb___024root.h"
+#include "Vtop_ws_tb__pch.h"
+#include "Vtop_ws_tb.h"
+#include "Vtop_ws_tb___024root.h"
 
 // FUNCTIONS
-Vmac_array_tb__Syms::~Vmac_array_tb__Syms()
+Vtop_ws_tb__Syms::~Vtop_ws_tb__Syms()
 {
 #ifdef VM_TRACE
     if (__Vm_dumping) _traceDumpClose();
 #endif  // VM_TRACE
 }
 
-void Vmac_array_tb__Syms::_traceDump() {
+void Vtop_ws_tb__Syms::_traceDump() {
     const VerilatedLockGuard lock(__Vm_dumperMutex);
     __Vm_dumperp->dump(VL_TIME_Q());
 }
 
-void Vmac_array_tb__Syms::_traceDumpOpen() {
+void Vtop_ws_tb__Syms::_traceDumpOpen() {
     const VerilatedLockGuard lock(__Vm_dumperMutex);
     if (VL_UNLIKELY(!__Vm_dumperp)) {
         __Vm_dumperp = new VerilatedVcdC();
@@ -29,13 +29,13 @@ void Vmac_array_tb__Syms::_traceDumpOpen() {
     }
 }
 
-void Vmac_array_tb__Syms::_traceDumpClose() {
+void Vtop_ws_tb__Syms::_traceDumpClose() {
     const VerilatedLockGuard lock(__Vm_dumperMutex);
     __Vm_dumping = false;
     VL_DO_CLEAR(delete __Vm_dumperp, __Vm_dumperp = nullptr);
 }
 
-Vmac_array_tb__Syms::Vmac_array_tb__Syms(VerilatedContext* contextp, const char* namep, Vmac_array_tb* modelp)
+Vtop_ws_tb__Syms::Vtop_ws_tb__Syms(VerilatedContext* contextp, const char* namep, Vtop_ws_tb* modelp)
     : VerilatedSyms{contextp}
     // Setup internal state of the Syms class
     , __Vm_modelp{modelp}
@@ -43,7 +43,7 @@ Vmac_array_tb__Syms::Vmac_array_tb__Syms(VerilatedContext* contextp, const char*
     , TOP{this, namep}
 {
         // Check resources
-        Verilated::stackCheck(38);
+        Verilated::stackCheck(126);
     // Configure time unit / time precision
     _vm_contextp__->timeunit(-9);
     _vm_contextp__->timeprecision(-9);
