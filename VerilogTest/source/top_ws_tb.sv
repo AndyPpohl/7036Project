@@ -5,7 +5,7 @@ module top_ws_tb;
   // ===========================================================================
   // Parameters — change DIM/DATAW here to test different configurations
   // ===========================================================================
-  parameter DIM    = 4;
+  parameter DIM   = 32;
   parameter DATAW = 8;
   //parameter PSUMW = 2*DATAW + 4
   parameter PSUMW = 32;

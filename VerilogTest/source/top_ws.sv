@@ -1,36 +1,7 @@
 `timescale 1ns/1ns
 
-`timescale 1ns/1ns
-
-// =============================================================================
-// top_ws.v — Weight-Stationary Systolic Array Top Level
-// =============================================================================
-// Timing / skew analysis:
-//
-//   INPUT SKEWING (rows of A):
-//     Row i must be delayed i cycles so the diagonal wavefront aligns.
-//     Row 0 => 0 registers (logic direct)
-//     Row 1 => 1 register
-//     Row i => i registers
-//     Implemented: sr_a[row][0..DIM-1], row i uses tap (i-1) for i>0,
-//                  row 0 bypasses directly.
-//
-//   OUTPUT DE-SKEWING (columns of C from array bottom):
-//     Activation A[i][k] enters column k at cycle i+k (0-indexed, after skew).
-//     It exits p_logic[DIM][k] DIM cycles later at cycle i+k+DIM.
-//     Last accumulation for column col: i=DIM-1, k=col => cycle DIM-1+col+DIM.
-//     col 0   done at cycle 2*DIM-1  (EARLIEST)
-//     col j   done at cycle 2*DIM-1+j
-//     col DIM-1 done at cycle 3*DIM-2 (LATEST)
-//     Extra delay for col j = (DIM-1-j) registers.
-//     col 0   => DIM-1 registers
-//     col DIM-1 => 0 (pass-through)
-//
-//   LATENCY = 3*DIM - 2 cycles from first start-aligned activation.
-// =============================================================================
-
 module top_ws #(
-    parameter DIM   = 4,
+    parameter DIM   = 32,
     parameter DATAW = 8,
     //parameter PSUMW = 2*DATAW + 4
     parameter PSUMW = 32

@@ -1,15 +1,7 @@
 `timescale 1ns/1ns
 
-// =============================================================================
-// systolic_array.v — Weight-Stationary DIMxDIM Systolic Array
-// =============================================================================
-// out_psum exposes only the BOTTOM row of p_wire (p_wire[DIM][col]).
-// This is the only row that holds complete dot products.
-// Intermediate rows hold partial sums and must not be used as outputs.
-// =============================================================================
-
 module systolic_array #(
-    parameter DIM    = 4,
+    parameter DIM   = 32,
     parameter DATAW = 8,
     //parameter PSUMW = 2*DATAW + 4
     parameter PSUMW = 32
