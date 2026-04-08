@@ -1,7 +1,7 @@
 `timescale 1ns/1ns
 
 module top_ws #(
-    parameter DIM   = 32,
+    parameter DIM   = 14,
     parameter DATAW = 8,
     //parameter PSUMW = 2*DATAW + 4
     parameter PSUMW = 32
@@ -9,46 +9,49 @@ module top_ws #(
     input  logic                       clk,
     input  logic                       rst_n,
 
-    input  logic                       load_weight,
-    input  logic [DIM*DIM*DATAW-1:0]   weights_in,
+    input  logic signed                       load_weight,
+    input  logic signed [DIM*DIM*DATAW-1:0]   weights_in,
 
-    input  logic                       start,
-    input  logic [DIM*DATAW-1:0]       in_a,
+    input  logic signed                       start,
+    input  logic signed [DIM*DATAW-1:0]       in_a,
 
-    output logic [DIM*PSUMW-1:0]       out_c,
-    output logic                       row_valid
+    output logic signed [DIM*PSUMW-1:0]       out_c,
+    output logic signed                       row_valid
 );
 
     // =========================================================================
-    // 1. Input skewing
-    //    Row 0: direct wire (0 registers)
-    //    Row i (i>0): i registers via shift chain sr_a[i][0..i-1]
+    // 
     // =========================================================================
 
-    logic  [DATAW-1:0] sr_a [0:DIM-1][0:DIM-2]; // max DIM-1 taps needed
-    logic  [DIM*DATAW-1:0] skewed_a;
+    logic signed  [DATAW-1:0] sr_a [0:DIM-1][0:DIM-2]; // max DIM-1 taps needed
+    logic signed  [DIM*DATAW-1:0] skewed_a;
 
     genvar row, col, tap;
 
     generate
-        for (row = 0; row < DIM; row++) begin : gen_skew_row
+        for (row = 0; row < DIM; row++) begin //skews for the rows
 
             if (row == 0) begin : gen_skew_direct
-                // Row 0: no delay
+                // Row 0 gets first A value without any delays
                 assign skewed_a[DATAW-1:0] = in_a[DATAW-1:0];
-
-            end else begin : gen_skew_shift
+            end 
+            else begin : gen_skew_shift
                 // Row i: i registers; sr_a[i][0] captures input,
                 // sr_a[i][i-1] is the output.
                 always @(posedge clk) begin
                     if (!rst_n) begin
                          sr_a[row][0] <= '0;
                     end
-                    else begin  
+                    else begin
+                        //shift in the next set of values from the row
+                        //i.e. if we have row 1, then we'll be dropping values  
+                        //contained within bits 15 to 23 of the input row 
                         sr_a[row][0] <= in_a[(row+1)*DATAW-1 -: DATAW];
                     end
                 end
 
+                //Shift all the values down
+                //i.e. value in row 1 col 0 gets moved into row 1 col 1 and so on
                 for (tap = 1; tap < DIM-1; tap++) begin : gen_skew_tap
                     always @(posedge clk) begin
                         if (!rst_n) sr_a[row][tap] <= '0;
@@ -56,23 +59,28 @@ module top_ws #(
                     end
                 end
 
-                // Row i output comes from tap i-1 (0-indexed)
+                //the a input value that gets sent into the systolic array is this skewed_a
+                //the skewed_a will contain the full input row for each cycle
                 assign skewed_a[(row+1)*DATAW-1 -: DATAW] = sr_a[row][row-1];
+
+                //i.e. cycle 1 for a 4x4 matrix numbered 1-16, skewed a will have 1000
+                //cycle 2 it will have 5200, cycle 3 will be 9630, cycle 4 will be 13 10 7 4,
+                //cycle 5 would be 0 14 11 8, and so on and so forth  
             end
         end
     endgenerate
 
     // =========================================================================
-    // 2. Systolic array
+    // Instantiate the array, feed the input the skewed a and output full psum
     // =========================================================================
 
-    logic [DIM*PSUMW-1:0] raw_psum;
+    logic signed [DIM*PSUMW-1:0] raw_psum;
 
     systolic_array #(
         .DIM    (DIM),
         .DATAW (DATAW),
         .PSUMW (PSUMW)
-    ) u_array (
+    ) array (
         .clk         (clk),
         .rst_n       (rst_n),
         .load_weight (load_weight),
@@ -82,15 +90,12 @@ module top_ws #(
     );
 
     // =========================================================================
-    // 3. Output de-skewing
-    //    col j needs (DIM-1-j) extra delay registers.
-    //    col DIM-1 => 0 registers (pass-through, slowest raw output)
-    //    col 0     => DIM-1 registers (fastest raw output, most padding)
-    //    Output tap for col j: sr_c[col][DIM-2-j]  (0-indexed)
+    // De-skewing the outputs
     // =========================================================================
 
-    logic [PSUMW-1:0] sr_c [0:DIM-1][0:DIM-2];
-
+    logic signed [PSUMW-1:0] sr_out [0:DIM-1][0:DIM-2];
+    
+    //here we're bascially doing the opposite of what we did when skewing inputs
     generate
         for (col = 0; col < DIM; col++) begin : gen_deskew
 
@@ -101,29 +106,26 @@ module top_ws #(
             end else begin : gen_shift
                 // Tap 0: register raw_psum
                 always @(posedge clk) begin
-                    if (!rst_n) sr_c[col][0] <= '0;
-                    else        sr_c[col][0] <= raw_psum[(col+1)*PSUMW-1 -: PSUMW];
+                    if (!rst_n) sr_out[col][0] <= '0;
+                    else        sr_out[col][0] <= raw_psum[(col+1)*PSUMW-1 -: PSUMW];
                 end
 
                 // Taps 1..DIM-2
                 for (tap = 1; tap < DIM-1; tap++) begin : gen_shift_tap
                     always @(posedge clk) begin
-                        if (!rst_n) sr_c[col][tap] <= '0;
-                        else        sr_c[col][tap] <= sr_c[col][tap-1];
+                        if (!rst_n) sr_out[col][tap] <= '0;
+                        else        sr_out[col][tap] <= sr_out[col][tap-1];
                     end
                 end
 
                 // col j needs DIM-1-j taps => output at index DIM-2-j
-                assign out_c[(col+1)*PSUMW-1 -: PSUMW] = sr_c[col][DIM-2-col];
+                assign out_c[(col+1)*PSUMW-1 -: PSUMW] = sr_out[col][DIM-2-col];
             end
         end
     endgenerate
 
     // =========================================================================
-    // 4. valid_out counter
-    //    LATENCY = (DIM-1) input skew + DIM array depth + (DIM-1) output skew
-    //            = 3*DIM - 2
-    //    valid_out high for DIM cycles from LATENCY onward (one row of C each).
+    // Row output valid registering
     // =========================================================================
 
     localparam LATENCY = 3 * DIM - 2;
@@ -134,6 +136,10 @@ module top_ws #(
 
     logic [CTR_W-1:0] ctr;
     logic             counting;
+    
+    //basically all we're doing here is counting until we know it's time for an output
+    //once we know the correct number of cycles has passed for us to receive an output 
+    //from the matrix, we'll send a row_valid signal, saying that the row has been completed
 
     always @(posedge clk) begin
         if (!rst_n) begin

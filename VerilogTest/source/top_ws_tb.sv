@@ -3,9 +3,9 @@
 module top_ws_tb;
 
   // ===========================================================================
-  // Parameters — change DIM/DATAW here to test different configurations
+  // Parameters Instantiation
   // ===========================================================================
-  parameter DIM   = 32;
+  parameter DIM   = 14;
   parameter DATAW = 8;
   //parameter PSUMW = 2*DATAW + 4
   parameter PSUMW = 32;
@@ -17,19 +17,17 @@ module top_ws_tb;
   // ===========================================================================
   // DUT signals
   // ===========================================================================
-  logic                        clk    = 0;
-  logic                        rst_n  = 0;
-  logic                        load_weight;
-  logic [DIM*DIM*DATAW-1:0]   weights_in;
-  logic                        start;
-  logic [DIM*DATAW-1:0]       in_a;
-  wire  [DIM*PSUMW-1:0]       out_c;
-  //wire                         valid_out;
-  logic                       row_valid;
+  logic                     clk    = 0;
+  logic                     rst_n  = 0;
+  logic signed                     load_weight;
+  logic signed [DIM*DIM*DATAW-1:0] weights_in;
+  logic signed                     start;
+  logic signed [DIM*DATAW-1:0]     in_a;
+  wire  [DIM*PSUMW-1:0]     out_c;
+  //wire                    valid_out;
+  logic signed                     row_valid;
 
-  // ===========================================================================
-  // Clock
-  // ===========================================================================
+  //set up the clock
   always #(PERIOD/2) clk++;
 
   // ===========================================================================
@@ -52,33 +50,18 @@ module top_ws_tb;
   );
 
   // ===========================================================================
-  // Test matrices — edit these to try different inputs
-  //
-  // A = [ 1  2  3  4 ]    B = [ 1  0  0  0 ]
-  //     [ 5  6  7  8 ]        [ 0  2  0  0 ]
-  //     [ 9 10 11 12 ]        [ 0  0  3  0 ]
-  //     [13 14 15 16 ]        [ 0  0  0  4 ]
-  //
-  // Expected C = A * B:
-  // C[i][j] = A[i][j] * B[j][j]  (since B is diagonal)
-  //
-  // C = [  1   4   9  16 ]
-  //     [  5  12  21  32 ]
-  //     [  9  20  33  48 ]
-  //     [ 13  28  45  64 ]
+  // Test matrices
   // ===========================================================================
-  logic [DATAW-1:0] A [0:DIM-1][0:DIM-1];
-  logic [DATAW-1:0] B [0:DIM-1][0:DIM-1];
-  logic [PSUMW-1:0] C_expected [0:DIM-1][0:DIM-1];
-  logic [PSUMW-1:0] C_got      [0:DIM-1][0:DIM-1];
+  logic signed [DATAW-1:0] A [0:DIM-1][0:DIM-1];
+  logic signed [DATAW-1:0] B [0:DIM-1][0:DIM-1];
+  logic signed [PSUMW-1:0] C_expected [0:DIM-1][0:DIM-1];
+  logic signed [PSUMW-1:0] C_got      [0:DIM-1][0:DIM-1];
 
   // ===========================================================================
   // Tasks
   // ===========================================================================
 
-  // ---------------------------------------------------------------------------
-  // reset_dut: mirror of nrst_dut from the mac testbench
-  // ---------------------------------------------------------------------------
+  //Resets the device, just run this when starting the program
   task reset_dut;
     begin
       rst_n       = 0;
@@ -93,9 +76,9 @@ module top_ws_tb;
     end
   endtask
 
-  // ---------------------------------------------------------------------------
-  // load_weights: pack B into the flat weights_in bus and strobe load_weight
-  // ---------------------------------------------------------------------------
+
+  //loads weights into input weight matrix and then tells the system to load
+  //new weights in by pulsing the load_weight signal
   task load_weights;
     integer r, c;
     begin
@@ -103,9 +86,9 @@ module top_ws_tb;
       for (r = 0; r < DIM; r++) begin
         for (c = 0; c < DIM; c++) begin
           weights_in[((r*DIM + c)+1)*DATAW-1 -: DATAW] = B[r][c];
-          $write("  B[%0d][%0d] = %0d", r, c, B[r][c]);
+          //$write("  B[%0d][%0d] = %0d", r, c, B[r][c]);
         end
-        $write("\n");
+        //$write("\n");
       end
 
       @(posedge clk);
@@ -117,32 +100,36 @@ module top_ws_tb;
   endtask
 
   // ---------------------------------------------------------------------------
-  // run_multiply: clock-aligned streaming of A columns, then flush
+  // run_multiply: clock-aligned streaming of A rows, then flush
   //   - start is asserted on the posedge when column 0 is driven
   //   - each subsequent column is driven on the next posedge
   //   - in_a is zeroed and LATENCY extra clocks are waited for drain
   // ---------------------------------------------------------------------------
+
   task run_multiply;
     integer k, r;
     begin
       $display("[%0t] Starting matrix multiply, streaming A columns...", $time);
 
-      // Drive column 0 and assert start together, just after a rising edge
+      //Feeds the values of the first row of the input matrix across the columns
+      //of the systolic array
       @(posedge clk); #1;
       start = 1;
       for (r = 0; r < DIM; r++)
         in_a[(r+1)*DATAW-1 -: DATAW] = A[0][r];
 
-      // Remaining columns: deassert start, drive next column each cycle
+      //feeds values of all subsequent rows across the subsequent columns
+      //the array will basically keep eating all of these values into column 0
+      //go until all rows have been properly fed
       for (k = 1; k < DIM; k++) begin
         @(posedge clk); #1;
         start = 0;
-        $display("[%0t]   Feeding column %0d of A.", $time, k);
+        //$display("[%0t]   Feeding row %0d of A.", $time, k);
         for (r = 0; r < DIM; r++)
           in_a[(r+1)*DATAW-1 -: DATAW] = A[k][r];
       end
 
-      // Clear inputs — flush is handled by the enclosing fork/join
+      // Clear inputs 
       @(posedge clk); #1;
       start = 0;
       in_a  = '0;
@@ -152,8 +139,10 @@ module top_ws_tb;
   endtask
 
   // ---------------------------------------------------------------------------
-  // capture_outputs: poll for valid_out after each posedge, sample out_c
-  //   on the same cycle valid_out is high (do NOT skip to next edge first)
+  // capture_outputs: keep polling for the row_valid signal, if we do get a row
+  // valid signal, then we'll capture whatever value is on out_c and store it
+  // into our big C_got array, once we've collected all output rows to fill the
+  // matrix, then we'll finish and print the whole thing
   // ---------------------------------------------------------------------------
   task capture_outputs;
     integer row, c;
@@ -167,15 +156,15 @@ module top_ws_tb;
         @(posedge clk);
 
         if (row_valid) begin
-          // Capture this row immediately at the clock edge
+          // Capture this row
           for (c = 0; c < DIM; c++)
             C_got[row][c] = out_c[(c+1)*PSUMW-1 -: PSUMW];
 
           // Print it
-          $write("[%0t] C_got[%0d] =", $time, row);
-          for (c = 0; c < DIM; c++)
-            $write(" %4d", C_got[row][c]);
-          $write("\n");
+          //$write("[%0t] C_got[%0d] =", $time, row);
+          //for (c = 0; c < DIM; c++)
+          //  $write(" %4d", C_got[row][c]);
+          //$write("\n");
 
           row++;
         end
@@ -186,7 +175,7 @@ module top_ws_tb;
   endtask
 
   // ---------------------------------------------------------------------------
-  // compute_expected: software golden model C = A * B
+  // Comput the golden software model to verify correctness
   // ---------------------------------------------------------------------------
   task compute_expected;
     integer r, c, k;
@@ -210,21 +199,21 @@ module top_ws_tb;
       errors = 0;
       $display("\n[%0t] --- Result Check ---", $time);
 
-      $display("Expected C = A * B:");
-      for (r = 0; r < DIM; r++) begin
-        $write("  C_exp[%0d] =", r);
-        for (c = 0; c < DIM; c++)
-          $write(" %4d", C_expected[r][c]);
-        $write("\n");
-      end
+      //$display("Expected C = A * B:");
+      //for (r = 0; r < DIM; r++) begin
+      //  $write("  C_exp[%0d] =", r);
+      //  for (c = 0; c < DIM; c++)
+          //$write(" %4d", C_expected[r][c]);
+        //$write("\n");
+      //end
 
-      $display("Got:");
-      for (r = 0; r < DIM; r++) begin
-        $write("  C_got[%0d] =", r);
-        for (c = 0; c < DIM; c++)
-          $write(" %4d", C_got[r][c]);
-        $write("\n");
-      end
+      //$display("Got:");
+      //for (r = 0; r < DIM; r++) begin
+        //$write("  C_got[%0d] =", r);
+        //for (c = 0; c < DIM; c++)
+          //$write(" %4d", C_got[r][c]);
+        //$write("\n");
+      //end
 
       for (r = 0; r < DIM; r++)
         for (c = 0; c < DIM; c++)
@@ -241,8 +230,11 @@ module top_ws_tb;
     end
   endtask
 
+
+
+
   // ===========================================================================
-  // Stimulus
+  // Test Run
   // ===========================================================================
   initial begin
     $dumpfile("outputs/wave.vcd");
@@ -251,20 +243,21 @@ module top_ws_tb;
     // -------------------------------------------------------------------------
     // Initialise test matrices
     // -------------------------------------------------------------------------
-    // Matrix A (row-major)
+    // Matrix A
     /*
     A[0] = '{8'd1,  8'd2,  8'd3,  8'd4 };
     A[1] = '{8'd5,  8'd6,  8'd7,  8'd8 };
     A[2] = '{8'd9,  8'd10, 8'd11, 8'd12};
     A[3] = '{8'd13, 8'd14, 8'd15, 8'd16};
 
-    // Matrix B (diagonal — easy to verify by hand)
+    // Matrix B
     B[0] = '{8'd1, 8'd0, 8'd0, 8'd0};
     B[1] = '{8'd0, 8'd2, 8'd0, 8'd0};
     B[2] = '{8'd0, 8'd0, 8'd3, 8'd0};
     B[3] = '{8'd0, 8'd0, 8'd0, 8'd4};
     */
 
+    //this is just creating numbered arrays, good for testing scale
     for (int i = 0; i < DIM; i++) begin
       for (int j = 0; j < DIM; j++) begin
           A[i][j] = DATAW'(i*DIM + j + 1);
@@ -273,19 +266,21 @@ module top_ws_tb;
     end
 
     // -------------------------------------------------------------------------
-    // Run
+    // First Test
     // -------------------------------------------------------------------------
     reset_dut;
+
     compute_expected;
+    
     load_weights;
     // Run streaming and output capture concurrently so capture_outputs
     // can poll valid_out while run_multiply is still flushing.
     fork
-      begin : feed_thread
+      begin : feed_inputs
         run_multiply;
         // Keep flushing zeros until capture_thread finishes
         repeat (2*DIM) @(posedge clk);
-        $display("[%0t] Feed thread done.", $time);
+        $display("[%0t] Feed inputs done.", $time);
       end
       begin : capture_thread
         capture_outputs;
@@ -294,7 +289,7 @@ module top_ws_tb;
     check_results;
 
     // -------------------------------------------------------------------------
-    // Second test: all-ones matrices  C = A*B where A=B=1s => C[i][j] = DIM
+    // Second test: all-ones matrice
     // -------------------------------------------------------------------------
   
     $display("[%0t] --- Second test: all-ones matrices ---", $time);

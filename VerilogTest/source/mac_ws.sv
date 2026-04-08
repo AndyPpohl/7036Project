@@ -9,23 +9,24 @@ module mac_ws #(
     input  logic                  rst_n,       // active-low synchronous reset
 
     // Weight loading (done once before the computation starts)
-    input  logic                  load_weight,
-    input  logic  [DATAW-1:0]     weight_in,
+    input  logic signed                 load_weight,
+    input  logic signed [DATAW-1:0]     weight_in,
 
     // Activation datapath (horizontal, left → right)
-    input  logic  [DATAW-1:0]     in_a,
-    output logic  [DATAW-1:0]     out_a,
+    input  logic signed [DATAW-1:0]     in_a,
+    output logic signed [DATAW-1:0]     out_a,
 
     // Partial-sum datapath (vertical, top → bottom)
-    input  logic  [PSUMW-1:0]     in_psum,
-    output logic  [PSUMW-1:0]     out_psum
+    input  logic signed [PSUMW-1:0]     in_psum,
+    output logic signed [PSUMW-1:0]     out_psum
 );
 
     // -------------------------------------------------------------------------
     // Stored weight register
     // -------------------------------------------------------------------------
-    logic [DATAW-1:0] weight_reg;
-
+    logic signed [DATAW-1:0] weight_reg;
+    
+    //weights are registered for weight stationary dataflow
     always @(posedge clk) begin
         if (!rst_n) begin
             weight_reg <= {DATAW{1'b0}};
@@ -36,6 +37,9 @@ module mac_ws #(
         end
     end
 
+    // -------------------------------------------------------------------------
+    // Perform MAC operation using registered weight
+    // -------------------------------------------------------------------------
     always @(posedge clk) begin
         if (!rst_n) begin
             out_a    <= {DATAW{1'b0}};
