@@ -1,0 +1,230 @@
+[*]
+[*] GTKWave Analyzer v3.3.116 (w)1999-2023 BSI
+[*] Mon Mar 30 17:14:41 2026
+[*]
+[dumpfile] "/home/andy/7036proj/VerilogTest/outputs/wave.vcd"
+[dumpfile_mtime] "Mon Mar 30 16:41:04 2026"
+[dumpfile_size] 39756
+[savefile] "/home/andy/7036proj/VerilogTest/source/waveform.gtkw"
+[timestart] 0
+[size] 1920 985
+[pos] -27 -24
+*-6.242448 145 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] TOP.
+[treeopen] TOP.top_ws_tb.
+[treeopen] TOP.top_ws_tb.dut.
+[treeopen] TOP.top_ws_tb.dut.u_array.
+[treeopen] TOP.top_ws_tb.dut.u_array.gen_row[0].
+[treeopen] TOP.top_ws_tb.dut.u_array.gen_row[0].gen_col[0].
+[treeopen] TOP.top_ws_tb.dut.u_array.gen_row[0].gen_col[1].
+[treeopen] TOP.top_ws_tb.dut.u_array.gen_row[0].gen_col[2].
+[treeopen] TOP.top_ws_tb.dut.u_array.gen_row[0].gen_col[3].
+[treeopen] TOP.top_ws_tb.dut.u_array.gen_row[1].gen_col[0].
+[treeopen] TOP.top_ws_tb.dut.u_array.gen_row[1].gen_col[1].
+[treeopen] TOP.top_ws_tb.dut.u_array.gen_row[1].gen_col[2].
+[treeopen] TOP.top_ws_tb.dut.u_array.gen_row[1].gen_col[3].
+[treeopen] TOP.top_ws_tb.dut.u_array.gen_row[2].gen_col[0].
+[treeopen] TOP.top_ws_tb.dut.u_array.gen_row[2].gen_col[1].
+[treeopen] TOP.top_ws_tb.dut.u_array.gen_row[2].gen_col[2].
+[treeopen] TOP.top_ws_tb.dut.u_array.gen_row[2].gen_col[3].
+[treeopen] TOP.top_ws_tb.dut.u_array.gen_row[3].gen_col[0].
+[treeopen] TOP.top_ws_tb.dut.u_array.gen_row[3].gen_col[1].
+[treeopen] TOP.top_ws_tb.dut.u_array.gen_row[3].gen_col[2].
+[treeopen] TOP.top_ws_tb.dut.u_array.gen_row[3].gen_col[3].
+[sst_width] 297
+[signals_width] 499
+[sst_expanded] 1
+[sst_vpaned_height] 633
+@24
+TOP.top_ws_tb.dut.u_array.gen_row[0].gen_col[0].u_mac.clk
+TOP.top_ws_tb.dut.u_array.in_a[31:0]
+TOP.top_ws_tb.dut.u_array.load_weight
+TOP.top_ws_tb.dut.u_array.weights_in[127:0]
+TOP.top_ws_tb.dut.u_array.out_psum[127:0]
+TOP.top_ws_tb.dut.skewed_a[31:0]
+TOP.top_ws_tb.dut.sr_a[0][0][7:0]
+TOP.top_ws_tb.dut.sr_a[0][1][7:0]
+TOP.top_ws_tb.dut.sr_a[0][2][7:0]
+TOP.top_ws_tb.dut.sr_a[1][0][7:0]
+TOP.top_ws_tb.dut.sr_a[1][1][7:0]
+TOP.top_ws_tb.dut.sr_a[1][2][7:0]
+TOP.top_ws_tb.dut.sr_a[2][0][7:0]
+TOP.top_ws_tb.dut.sr_a[2][1][7:0]
+TOP.top_ws_tb.dut.sr_a[2][2][7:0]
+TOP.top_ws_tb.dut.sr_a[3][0][7:0]
+TOP.top_ws_tb.dut.sr_a[3][1][7:0]
+TOP.top_ws_tb.dut.sr_a[3][2][7:0]
+[color] 1
+TOP.top_ws_tb.dut.sr_c[0][0][31:0]
+[color] 1
+TOP.top_ws_tb.dut.sr_c[0][1][31:0]
+[color] 1
+TOP.top_ws_tb.dut.sr_c[0][2][31:0]
+[color] 1
+TOP.top_ws_tb.dut.sr_c[1][0][31:0]
+[color] 1
+TOP.top_ws_tb.dut.sr_c[1][1][31:0]
+[color] 1
+TOP.top_ws_tb.dut.sr_c[1][2][31:0]
+[color] 1
+TOP.top_ws_tb.dut.sr_c[2][0][31:0]
+[color] 1
+TOP.top_ws_tb.dut.sr_c[2][1][31:0]
+[color] 1
+TOP.top_ws_tb.dut.sr_c[2][2][31:0]
+[color] 1
+TOP.top_ws_tb.dut.sr_c[3][0][31:0]
+[color] 1
+TOP.top_ws_tb.dut.sr_c[3][1][31:0]
+[color] 1
+TOP.top_ws_tb.dut.sr_c[3][2][31:0]
+@25
+TOP.top_ws_tb.dut.out_c[127:0]
+@24
+TOP.top_ws_tb.dut.u_array.p_wire[0][0][31:0]
+TOP.top_ws_tb.dut.u_array.p_wire[0][1][31:0]
+TOP.top_ws_tb.dut.u_array.p_wire[0][2][31:0]
+TOP.top_ws_tb.dut.u_array.p_wire[0][3][31:0]
+TOP.top_ws_tb.dut.u_array.p_wire[1][0][31:0]
+TOP.top_ws_tb.dut.u_array.p_wire[1][1][31:0]
+TOP.top_ws_tb.dut.u_array.p_wire[1][2][31:0]
+TOP.top_ws_tb.dut.u_array.p_wire[1][3][31:0]
+TOP.top_ws_tb.dut.u_array.p_wire[2][0][31:0]
+TOP.top_ws_tb.dut.u_array.p_wire[2][1][31:0]
+TOP.top_ws_tb.dut.u_array.p_wire[2][2][31:0]
+TOP.top_ws_tb.dut.u_array.p_wire[2][3][31:0]
+TOP.top_ws_tb.dut.u_array.p_wire[3][0][31:0]
+TOP.top_ws_tb.dut.u_array.p_wire[3][1][31:0]
+TOP.top_ws_tb.dut.u_array.p_wire[3][2][31:0]
+TOP.top_ws_tb.dut.u_array.p_wire[3][3][31:0]
+TOP.top_ws_tb.dut.u_array.p_wire[4][0][31:0]
+TOP.top_ws_tb.dut.u_array.p_wire[4][1][31:0]
+TOP.top_ws_tb.dut.u_array.p_wire[4][2][31:0]
+TOP.top_ws_tb.dut.u_array.p_wire[4][3][31:0]
+TOP.top_ws_tb.dut.u_array.out_psum[127:0]
+@200
+-ROW 3
+@24
+TOP.top_ws_tb.dut.u_array.gen_row[3].gen_col[0].u_mac.weight_in[7:0]
+TOP.top_ws_tb.dut.u_array.gen_row[3].gen_col[0].u_mac.in_a[7:0]
+TOP.top_ws_tb.dut.u_array.gen_row[3].gen_col[0].u_mac.out_a[7:0]
+[color] 3
+TOP.top_ws_tb.dut.u_array.gen_row[3].gen_col[0].u_mac.in_psum[31:0]
+[color] 3
+TOP.top_ws_tb.dut.u_array.gen_row[3].gen_col[0].u_mac.out_psum[31:0]
+TOP.top_ws_tb.dut.u_array.gen_row[3].gen_col[1].u_mac.weight_in[7:0]
+TOP.top_ws_tb.dut.u_array.gen_row[3].gen_col[1].u_mac.in_a[7:0]
+TOP.top_ws_tb.dut.u_array.gen_row[3].gen_col[1].u_mac.out_a[7:0]
+[color] 3
+TOP.top_ws_tb.dut.u_array.gen_row[3].gen_col[1].u_mac.in_psum[31:0]
+[color] 3
+TOP.top_ws_tb.dut.u_array.gen_row[3].gen_col[1].u_mac.out_psum[31:0]
+TOP.top_ws_tb.dut.u_array.gen_row[3].gen_col[2].u_mac.weight_in[7:0]
+TOP.top_ws_tb.dut.u_array.gen_row[3].gen_col[2].u_mac.in_a[7:0]
+TOP.top_ws_tb.dut.u_array.gen_row[3].gen_col[2].u_mac.out_a[7:0]
+[color] 3
+TOP.top_ws_tb.dut.u_array.gen_row[3].gen_col[2].u_mac.in_psum[31:0]
+[color] 3
+TOP.top_ws_tb.dut.u_array.gen_row[3].gen_col[2].u_mac.out_psum[31:0]
+TOP.top_ws_tb.dut.u_array.gen_row[3].gen_col[3].u_mac.weight_in[7:0]
+TOP.top_ws_tb.dut.u_array.gen_row[3].gen_col[3].u_mac.in_a[7:0]
+TOP.top_ws_tb.dut.u_array.gen_row[3].gen_col[3].u_mac.out_a[7:0]
+[color] 3
+TOP.top_ws_tb.dut.u_array.gen_row[3].gen_col[3].u_mac.in_psum[31:0]
+[color] 3
+TOP.top_ws_tb.dut.u_array.gen_row[3].gen_col[3].u_mac.out_psum[31:0]
+@200
+-ROW2
+@24
+TOP.top_ws_tb.dut.u_array.gen_row[2].gen_col[0].u_mac.weight_in[7:0]
+TOP.top_ws_tb.dut.u_array.gen_row[2].gen_col[0].u_mac.in_a[7:0]
+TOP.top_ws_tb.dut.u_array.gen_row[2].gen_col[0].u_mac.out_a[7:0]
+[color] 1
+TOP.top_ws_tb.dut.u_array.gen_row[2].gen_col[0].u_mac.in_psum[31:0]
+[color] 1
+TOP.top_ws_tb.dut.u_array.gen_row[2].gen_col[0].u_mac.out_psum[31:0]
+TOP.top_ws_tb.dut.u_array.gen_row[2].gen_col[1].u_mac.weight_in[7:0]
+TOP.top_ws_tb.dut.u_array.gen_row[2].gen_col[1].u_mac.in_a[7:0]
+TOP.top_ws_tb.dut.u_array.gen_row[2].gen_col[1].u_mac.out_a[7:0]
+[color] 1
+TOP.top_ws_tb.dut.u_array.gen_row[2].gen_col[1].u_mac.in_psum[31:0]
+[color] 1
+TOP.top_ws_tb.dut.u_array.gen_row[2].gen_col[1].u_mac.out_psum[31:0]
+TOP.top_ws_tb.dut.u_array.gen_row[2].gen_col[2].u_mac.weight_in[7:0]
+TOP.top_ws_tb.dut.u_array.gen_row[2].gen_col[2].u_mac.in_a[7:0]
+TOP.top_ws_tb.dut.u_array.gen_row[2].gen_col[2].u_mac.out_a[7:0]
+[color] 1
+TOP.top_ws_tb.dut.u_array.gen_row[2].gen_col[2].u_mac.in_psum[31:0]
+[color] 1
+TOP.top_ws_tb.dut.u_array.gen_row[2].gen_col[2].u_mac.out_psum[31:0]
+TOP.top_ws_tb.dut.u_array.gen_row[2].gen_col[3].u_mac.weight_in[7:0]
+TOP.top_ws_tb.dut.u_array.gen_row[2].gen_col[3].u_mac.in_a[7:0]
+TOP.top_ws_tb.dut.u_array.gen_row[2].gen_col[3].u_mac.out_a[7:0]
+[color] 1
+TOP.top_ws_tb.dut.u_array.gen_row[2].gen_col[3].u_mac.in_psum[31:0]
+[color] 1
+TOP.top_ws_tb.dut.u_array.gen_row[2].gen_col[3].u_mac.out_psum[31:0]
+@200
+-ROW1
+@24
+TOP.top_ws_tb.dut.u_array.gen_row[1].gen_col[0].u_mac.weight_in[7:0]
+TOP.top_ws_tb.dut.u_array.gen_row[1].gen_col[0].u_mac.in_a[7:0]
+TOP.top_ws_tb.dut.u_array.gen_row[1].gen_col[0].u_mac.out_a[7:0]
+[color] 1
+TOP.top_ws_tb.dut.u_array.gen_row[1].gen_col[0].u_mac.in_psum[31:0]
+[color] 1
+TOP.top_ws_tb.dut.u_array.gen_row[1].gen_col[0].u_mac.out_psum[31:0]
+TOP.top_ws_tb.dut.u_array.gen_row[1].gen_col[1].u_mac.weight_in[7:0]
+TOP.top_ws_tb.dut.u_array.gen_row[1].gen_col[1].u_mac.in_a[7:0]
+TOP.top_ws_tb.dut.u_array.gen_row[1].gen_col[1].u_mac.out_a[7:0]
+[color] 1
+TOP.top_ws_tb.dut.u_array.gen_row[1].gen_col[1].u_mac.in_psum[31:0]
+[color] 1
+TOP.top_ws_tb.dut.u_array.gen_row[1].gen_col[1].u_mac.out_psum[31:0]
+TOP.top_ws_tb.dut.u_array.gen_row[1].gen_col[2].u_mac.weight_in[7:0]
+TOP.top_ws_tb.dut.u_array.gen_row[1].gen_col[2].u_mac.in_a[7:0]
+TOP.top_ws_tb.dut.u_array.gen_row[1].gen_col[2].u_mac.out_a[7:0]
+[color] 1
+TOP.top_ws_tb.dut.u_array.gen_row[1].gen_col[2].u_mac.in_psum[31:0]
+[color] 1
+TOP.top_ws_tb.dut.u_array.gen_row[1].gen_col[2].u_mac.out_psum[31:0]
+TOP.top_ws_tb.dut.u_array.gen_row[1].gen_col[3].u_mac.weight_in[7:0]
+TOP.top_ws_tb.dut.u_array.gen_row[1].gen_col[3].u_mac.in_a[7:0]
+TOP.top_ws_tb.dut.u_array.gen_row[1].gen_col[3].u_mac.out_a[7:0]
+[color] 1
+TOP.top_ws_tb.dut.u_array.gen_row[1].gen_col[3].u_mac.in_psum[31:0]
+[color] 1
+TOP.top_ws_tb.dut.u_array.gen_row[1].gen_col[3].u_mac.out_psum[31:0]
+@200
+-ROW0
+@24
+TOP.top_ws_tb.dut.u_array.gen_row[0].gen_col[0].u_mac.weight_in[7:0]
+TOP.top_ws_tb.dut.u_array.gen_row[0].gen_col[0].u_mac.in_a[7:0]
+TOP.top_ws_tb.dut.u_array.gen_row[0].gen_col[0].u_mac.out_a[7:0]
+[color] 1
+TOP.top_ws_tb.dut.u_array.gen_row[0].gen_col[0].u_mac.in_psum[31:0]
+[color] 1
+TOP.top_ws_tb.dut.u_array.gen_row[0].gen_col[0].u_mac.out_psum[31:0]
+TOP.top_ws_tb.dut.u_array.gen_row[0].gen_col[1].u_mac.weight_in[7:0]
+TOP.top_ws_tb.dut.u_array.gen_row[0].gen_col[1].u_mac.in_a[7:0]
+TOP.top_ws_tb.dut.u_array.gen_row[0].gen_col[1].u_mac.out_a[7:0]
+[color] 1
+TOP.top_ws_tb.dut.u_array.gen_row[0].gen_col[1].u_mac.in_psum[31:0]
+[color] 1
+TOP.top_ws_tb.dut.u_array.gen_row[0].gen_col[1].u_mac.out_psum[31:0]
+TOP.top_ws_tb.dut.u_array.gen_row[0].gen_col[2].u_mac.weight_in[7:0]
+TOP.top_ws_tb.dut.u_array.gen_row[0].gen_col[2].u_mac.in_a[7:0]
+TOP.top_ws_tb.dut.u_array.gen_row[0].gen_col[2].u_mac.out_a[7:0]
+[color] 1
+TOP.top_ws_tb.dut.u_array.gen_row[0].gen_col[2].u_mac.in_psum[31:0]
+[color] 1
+TOP.top_ws_tb.dut.u_array.gen_row[0].gen_col[2].u_mac.out_psum[31:0]
+TOP.top_ws_tb.dut.u_array.gen_row[0].gen_col[3].u_mac.weight_in[7:0]
+TOP.top_ws_tb.dut.u_array.gen_row[0].gen_col[3].u_mac.in_a[7:0]
+TOP.top_ws_tb.dut.u_array.gen_row[0].gen_col[3].u_mac.out_a[7:0]
+[color] 1
+TOP.top_ws_tb.dut.u_array.gen_row[0].gen_col[3].u_mac.in_psum[31:0]
+[color] 1
+TOP.top_ws_tb.dut.u_array.gen_row[0].gen_col[3].u_mac.out_psum[31:0]
+[pattern_trace] 1
+[pattern_trace] 0
