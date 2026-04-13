@@ -1,6 +1,6 @@
 `timescale 1ns/1ns
 
-module top_ws_tb;
+module skewer_ws_tb;
 
   // ===========================================================================
   // Parameters Instantiation
@@ -11,7 +11,7 @@ module top_ws_tb;
   parameter PSUMW = 32;
   parameter PERIOD = 10;
 
-  // Latency must match top_ws localparam
+  // Latency must match skewer_ws localparam
   parameter LATENCY = 3*DIM - 2;
 
   // ===========================================================================
@@ -33,7 +33,7 @@ module top_ws_tb;
   // ===========================================================================
   // DUT instantiation
   // ===========================================================================
-  top_ws #(
+  skewer_ws #(
     .DIM    (DIM),
     .DATAW (DATAW),
     .PSUMW (PSUMW)
@@ -238,7 +238,7 @@ module top_ws_tb;
   // ===========================================================================
   initial begin
     $dumpfile("outputs/wave.vcd");
-    $dumpvars(0, top_ws_tb);
+    $dumpvars(0, skewer_ws_tb);
 
     // -------------------------------------------------------------------------
     // Initialise test matrices
