@@ -1,7 +1,7 @@
 `timescale 1ns/1ns
 
 module systolic_array #(
-    parameter DIM   = 14,
+    parameter DIM   = 4,
     parameter DATAW = 8,
     //parameter PSUMW = 2*DATAW + 4
     parameter PSUMW = 32

@@ -12,7 +12,7 @@ module skewer_ws_tb;
   parameter PERIOD = 10;
 
   // Latency must match skewer_ws localparam
-  parameter LATENCY = 3*DIM - 2;
+  parameter LATENCY = 3 * DIM - 2;
 
   // ===========================================================================
   // DUT signals
@@ -46,7 +46,8 @@ module skewer_ws_tb;
     .in_a        (in_a),
     .out_c       (out_c),
     //.valid_out   (valid_out),
-    .row_valid   (row_valid)
+    .row_valid   (row_valid),
+    .in_skew_done(in_skew_done)
   );
 
   // ===========================================================================

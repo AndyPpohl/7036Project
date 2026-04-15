@@ -1,119 +1,224 @@
 `timescale 1ns/1ns
 
 module top_ws #(
-    parameter DIM   = 14,
+    parameter DIM   = 4,
     parameter DATAW = 8,
     parameter PSUMW = 32
 )(
-    input  logic                       clk,
-    input  logic                       rst_n,
-    
-    input  logic signed start,
+    input  logic clk,
+    input  logic rst_n,
 
-    input  logic signed [DIM*DIM*DATAW-1:0]   weights_in,
+    input  logic weight_load,
+    input  logic signed [DATAW-1:0] B [0:DIM-1][0:DIM-1],
 
-    input  logic signed [DIM*DATAW-1:0] in_a [0:DIM-1][0:DIM-1],
+    input  logic activation,
+    input  logic signed [DATAW-1:0] A [0:DIM-1][0:DIM-1],
 
-    output logic signed [DIM*PSUMW-1:0] out_c [0:DIM-1][0:DIM-1]
+    output logic signed [PSUMW-1:0] C [0:DIM-1][0:DIM-1],
+    output logic done,
+    output logic out_skew_done
 );
 
-  //loads weights into input weight matrix and then tells the system to load
-  //new weights in by pulsing the load_weight signal
-always_ff @(posedge clk, negedge nrst) begin
+    // ============================================================
+    // Internal flattened signals
+    // ============================================================
+    logic signed [DIM*DIM*DATAW-1:0] weights_flat;
+    logic signed [DIM*DATAW-1:0]     in_a_skew;
+    logic signed [DIM*PSUMW-1:0]     out_c_skew;
 
-    if(nrst) begin
-        weightflag <= 0;
+    logic load_weight;
+    logic skew_start;
+    logic row_valid;
+    logic in_skew_done;
+
+    // ============================================================
+    // Flatten B → weights_flat
+    // ============================================================
+    integer r, c, a, b;
+
+    always_comb begin
+        for (a = 0; a < DIM; a++)
+            for (b = 0; b < DIM; b++)
+                weights_flat[((a*DIM + b)+1)*DATAW-1 -: DATAW] = B[a][b];
     end
-    else begin 
-        for (r = 0; r < DIM; r++) begin
-            for (c = 0; c < DIM; c++) begin
-                weights_in_skew[((r*DIM + c)+1) * DATAW - 1 -: DATAW] <= weights_in[r][c];
-            end
-        end
 
-        if((r == (DIM-1)) && !weightflag) begin
-            weightflag <= 1;
-            load_weight <= 1;
-        end
-        
-        if(weightflag == 1) begin
-            load_weight <= 0;
-        end
-    end
-end
+    // ============================================================
+    // Instantiate skewer
+    // ============================================================
+    skewer_ws #(
+        .DIM   (DIM),
+        .DATAW (DATAW),
+        .PSUMW (PSUMW)
+    ) skewer (
+        .clk         (clk),
+        .rst_n       (rst_n),
+        .load_weight (load_weight),
+        .weights_in  (weights_flat),
+        .start       (skew_start),
+        .in_a        (in_a_skew),
+        .out_c       (out_c_skew),
+        .row_valid   (row_valid),
+        .in_skew_done(in_skew_done)
+    );
 
+    // ============================================================
+    // LOAD WEIGHTS
+    // Mirrors load_weights task: on weight_load pulse, assert
+    // load_weight into skewer for exactly one cycle
+    // ============================================================
+    always_ff @(posedge clk) begin
+        if (!rst_n) begin
+            load_weight <= 1'b0;
+            out_skew_done <= 0;
+        end else begin
+            out_skew_done <= in_skew_done;
 
-// ---------------------------------------------------------------------------
-// run_multiply: clock-aligned streaming of A rows, then flush
-//   - start is asserted on the posedge when column 0 is driven
-//   - each subsequent column is driven on the next posedge
-//   - in_a is zeroed and LATENCY extra clocks are waited for drain
-// ---------------------------------------------------------------------------
-
-always_ff @(posedge clk, negedge nrst) begin 
-    
-    if(nrst) begin
-        r <= 0;
-        k <= 0;
-        firstrow  <= 0;
-        in_a_skew <= 0;
-    end    
-    else begin
-        if ((r < DIM) && (firstrow)) begin
-            in_a_skew[(r+1)*DATAW-1 -: DATAW] <= in_a[0][r];
-            start <= 1;
-
-            if ((r + 1) == DIM) begin
-                r <= 0;
-                firstrow <= 0;
-            end
-            else begin
-                r <= r + 1;
-                firstrow <= 1;
-            end
-        end
-
-        if ((k < DIM) && (!firstrow)) begin 
-            start <= 0;
-            in_a_skew[(r+1)*DATAW-1 -: DATAW] = in_a[k][r];
-
-            if ((r + 1) == DIM) begin
-                r <= 0;
-                k <= k + 1;
-            end
-            else begin
-                r <= r + 1;
-            end
+            load_weight <= 1'b0;
+            if (weight_load)
+                load_weight <= 1'b1;
         end
     end
-end
+
+    // ============================================================
+    // STREAM INPUT A
+    // ============================================================
+    logic [31:0] k;
+    logic [31:0] stream_cnt;
+    logic [31:0] stream_len;
+    logic streaming;
+
+    always_ff @(posedge clk) begin
+        if (!rst_n) begin
+            k          <= '0;
+            streaming  <= 1'b0;
+            skew_start <= 1'b0;
+            in_a_skew  <= '0;
+            stream_cnt <= '0;
+            stream_len <= '0;
+            out_skew_done <= '0;
+        end else begin
+            skew_start    <= 1'b0;
+            out_skew_done <= 1'b0;
+
+            if (activation && !streaming) begin
+                streaming  <= 1'b1;
+                k          <= 1;
+                skew_start <= 1'b1;
+                stream_cnt <= 1;
+                stream_len <= DIM;
+                for (r = 0; r < DIM; r++)
+                    in_a_skew[(r+1)*DATAW-1 -: DATAW] <= A[0][r];
+            end
+            else if (activation && streaming) begin
+                skew_start <= 1'b1;
+                stream_len <= stream_len + DIM;
+                stream_cnt <= stream_cnt + 1;
+                for (r = 0; r < DIM; r++)
+                    in_a_skew[(r+1)*DATAW-1 -: DATAW] <= A[k][r];
+                if (k + 1 == DIM) begin
+                    k             <= '0;
+                    out_skew_done <= 1'b1;
+                end else begin
+                    k <= k + 1;
+                end
+            end
+            else if (streaming && stream_cnt < stream_len) begin
+                stream_cnt <= stream_cnt + 1;
+                for (r = 0; r < DIM; r++)
+                    in_a_skew[(r+1)*DATAW-1 -: DATAW] <= A[k][r];
+                if (k + 1 == DIM) begin
+                    k             <= '0;
+                    out_skew_done <= 1'b1;
+                end else begin
+                    k <= k + 1;
+                end
+            end
+            else if (streaming && stream_cnt == stream_len) begin
+                streaming  <= 1'b0;
+                stream_cnt <= '0;
+                in_a_skew  <= '0;
+            end
+            else if (!streaming) begin
+                k         <= '0;
+                in_a_skew <= '0;
+            end
+
+        end
+    end
+
+// ============================================================
+// CAPTURE OUTPUTS - uses double buffer and collects outputs
+// from the systolic array
+// ============================================================
+
+logic [31:0] row;
+
+// Ping-pong buffers
+logic signed [PSUMW-1:0] C_buf0 [0:DIM-1][0:DIM-1];
+logic signed [PSUMW-1:0] C_buf1 [0:DIM-1][0:DIM-1];
+
+logic buf_select;  // 0 = writing buf0, 1 = writing buf1
 
 
-  // ---------------------------------------------------------------------------
-  // capture_outputs: keep polling for the row_valid signal, if we do get a row
-  // valid signal, then we'll capture whatever value is on out_c and store it
-  // into our big C_got array, once we've collected all output rows to fill the
-  // matrix, then we'll finish and print the whole thing
-  // ---------------------------------------------------------------------------
-always_ff @(posedge clk, negedge nrst) begin 
-    
-    if(nrst) begin 
-        row <= 0;
-        out_c <= 0;
-    end 
-    else begin
+always_ff @(posedge clk) begin
+    if (!rst_n) begin
+        row        <= 0;
+        done       <= 0;
+        buf_select <= 0;
+
+        for (int i = 0; i < DIM; i++)
+            for (int j = 0; j < DIM; j++) begin
+                C_buf0[i][j] <= 0;
+                C_buf1[i][j] <= 0;
+            end
+    end else begin
+        done <= 1'b0;
+
         if (row < DIM) begin
             if (row_valid) begin
-                // Capture this row
-                for (c = 0; c < DIM; c++)
-                    out_c[row][c] <= out_c_skew[(c+1)*PSUMW-1 -: PSUMW];
-
+                for (int c = 0; c < DIM; c++) begin
+                    if (buf_select == 0)
+                        C_buf0[row][c] <= out_c_skew[(c+1)*PSUMW-1 -: PSUMW];
+                    else
+                        C_buf1[row][c] <= out_c_skew[(c+1)*PSUMW-1 -: PSUMW];
+                end
                 row <= row + 1;
             end
         end
+        else if (row == DIM) begin
+            // Matrix complete
+            done <= 1'b1;
+
+            // Swap buffers
+            buf_select <= ~buf_select;
+
+            if (row_valid) begin
+                for (int c = 0; c < DIM; c++) begin
+                    if (buf_select == 0)
+                        C_buf1[0][c] <= out_c_skew[(c+1)*PSUMW-1 -: PSUMW];
+                    else
+                        C_buf0[0][c] <= out_c_skew[(c+1)*PSUMW-1 -: PSUMW];
+                end
+                row <= 1;  // already captured row 0
+            end else begin
+                row <= 0;
+            end
+        end
     end
 end
 
-
+// ------------------------------------------------------------
+// Exposing completed output buffers on C
+// ------------------------------------------------------------
+always_comb begin
+    for (int i = 0; i < DIM; i++) begin
+        for (int j = 0; j < DIM; j++) begin
+            if (buf_select == 0)
+                C[i][j] = C_buf1[i][j];  // expose completed buffer
+            else
+                C[i][j] = C_buf0[i][j];
+        end
+    end
+end
 
 endmodule

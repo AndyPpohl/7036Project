@@ -1,7 +1,7 @@
 `timescale 1ns/1ns
 
 module skewer_ws #(
-    parameter DIM   = 14,
+    parameter DIM   = 4,
     parameter DATAW = 8,
     parameter PSUMW = 32
 )(
@@ -15,7 +15,8 @@ module skewer_ws #(
     input  logic signed [DIM*DATAW-1:0]       in_a,
 
     output logic signed [DIM*PSUMW-1:0]       out_c,
-    output logic signed                       row_valid
+    output logic signed                       row_valid,
+    output logic                              in_skew_done
 );
 
     // =========================================================================
@@ -46,6 +47,7 @@ module skewer_ws #(
                         //i.e. if we have row 1, then we'll be dropping values  
                         //contained within bits 15 to 23 of the input row 
                         sr_a[row][0] <= in_a[(row+1)*DATAW-1 -: DATAW];
+                        
                     end
                 end
 
@@ -65,6 +67,7 @@ module skewer_ws #(
                 //i.e. cycle 1 for a 4x4 matrix numbered 1-16, skewed a will have 1000
                 //cycle 2 it will have 5200, cycle 3 will be 9630, cycle 4 will be 13 10 7 4,
                 //cycle 5 would be 0 14 11 8, and so on and so forth  
+        
             end
         end
     endgenerate
@@ -133,35 +136,61 @@ module skewer_ws #(
     localparam [CTR_W-1:0] CTR_VALID_LO = LATENCY - 1;
     localparam [CTR_W-1:0] CTR_VALID_HI = LATENCY + DIM - 2;
 
-    logic [CTR_W-1:0] ctr;
+    logic [31:0] ctr;
+    logic [15:0] valid_ctr;
+    logic [15:0] valid_len;
+
+    logic             out_valid_flag;
     logic             counting;
     
     //basically all we're doing here is counting until we know it's time for an output
     //once we know the correct number of cycles has passed for us to receive an output 
     //from the matrix, we'll send a row_valid signal, saying that the row has been completed
 
-    always @(posedge clk) begin
+always @(posedge clk) begin
         if (!rst_n) begin
-            ctr       <= '0;
-            counting  <= 1'b0;
+            ctr          <= '0;
+            counting     <= 1'b0;
+            row_valid    <= 1'b0;
+            valid_len    <= 0;
+            valid_ctr    <= '0;
+            out_valid_flag <= 0;
         end else begin
-            if (start) begin
-                ctr      <= 1;
-                counting <= 1'b1;
-            end else if (counting) begin
+            if (start && !counting) begin
+                ctr       <= 1;
+                counting  <= 1'b1;
+                valid_len <= DIM - 1;
+            end
+            else if (start && counting) begin
+                ctr       <= ctr + 1'b1;
+                valid_len <= valid_len + (DIM);
+            end
+            else if (counting) begin
                 ctr <= ctr + 1'b1;
             end
 
-            if (counting && ctr == CTR_VALID_HI) begin
-                counting <= 1'b0;
-                ctr      <= '0;
+            if (ctr == (DIM * 2) - 2) begin
+                out_valid_flag <= 1;
+                valid_ctr      <= '0;
+                row_valid <= '1;
             end
+            else if (out_valid_flag && valid_ctr < valid_len) begin
+                valid_ctr <= valid_ctr + 1;
+            end
+            else if (out_valid_flag && valid_ctr == valid_len) begin
+                out_valid_flag <= 0;
+                valid_ctr      <= '0;
+                valid_len      <= DIM - 1;
+                row_valid      <= '0;
+            end
+
         end
     end
 
-    localparam logic [CTR_W-1:0] ROW_START = (DIM + (DIM - 1));
+    localparam logic [31:0] ROW_START = (DIM + (DIM - 1));
     localparam logic [CTR_W-1:0] ROW_END   = (DIM + (DIM - 1) + DIM);
 
-    assign row_valid = (ctr >= ROW_START) && (ctr < ROW_END);
+    assign in_skew_done = (ctr == ROW_START - 3);
+    //assign row_valid = (ctr >= ROW_START) && (ctr < ROW_END + 1);
 
 endmodule
