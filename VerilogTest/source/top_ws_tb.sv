@@ -16,7 +16,7 @@ module top_ws_tb;
   parameter LATENCY = 3 * DIM - 2;
 
   // ===========================================================================
-  // DUT signals
+  // DUT 
   // ===========================================================================
   logic                     clk    = 0;
   logic                     rst_n  = 0;
@@ -52,8 +52,9 @@ module top_ws_tb;
     .out_skew_done(out_skew_done)
 );
 
-
-
+  // ===========================================================================
+  // Tasks
+  // ===========================================================================
 
 task reset_dut;
 begin
@@ -78,9 +79,9 @@ endtask
 
 
 task compute_expected (
-    input  logic signed [DATAW-1:0] A_in [0:DIM-1][0:DIM-1],
-    input  logic signed [DATAW-1:0] B_in [0:DIM-1][0:DIM-1],
-    output logic signed [PSUMW-1:0] C_expected [0:DIM-1][0:DIM-1]
+    ref    logic signed [DATAW-1:0] A_in [0:DIM-1][0:DIM-1],
+    ref    logic signed [DATAW-1:0] B_in [0:DIM-1][0:DIM-1],
+    ref    logic signed [PSUMW-1:0] C_expected [0:DIM-1][0:DIM-1]
 );
     integer r, c, k;
     begin
@@ -98,8 +99,8 @@ endtask
 
 
 task check_results (
-    input logic signed [PSUMW-1:0] C_actual   [0:DIM-1][0:DIM-1],
-    input logic signed [PSUMW-1:0] C_expected [0:DIM-1][0:DIM-1]
+    ref   logic signed [PSUMW-1:0] C_actual   [0:DIM-1][0:DIM-1],
+    ref   logic signed [PSUMW-1:0] C_expected [0:DIM-1][0:DIM-1]
 );
     integer r, c;
     integer errors;
@@ -125,6 +126,11 @@ task check_results (
 endtask
 
 
+// ===========================================================================
+// Actual Testing
+// ===========================================================================
+
+
 logic signed [DATAW-1:0] A1 [0:DIM-1][0:DIM-1];
 logic signed [DATAW-1:0] A2 [0:DIM-1][0:DIM-1];
 logic signed [DATAW-1:0] A3 [0:DIM-1][0:DIM-1];
@@ -137,29 +143,37 @@ logic signed [PSUMW-1:0] C3_expected [0:DIM-1][0:DIM-1];
 logic signed [PSUMW-1:0] C4_expected [0:DIM-1][0:DIM-1];
 logic signed [PSUMW-1:0] C5_expected [0:DIM-1][0:DIM-1];
 
-logic signed [DATAW-1:0] val;
+logic signed [DATAW-1:0] val4;
+logic signed [DATAW-1:0] val1;
+
 
 initial begin
 
     $dumpfile("outputs/wave.vcd");
     $dumpvars(0, top_ws_tb);
 
-
-    val = DIM * DIM;
+    val1 = 0;
+    val4 = DIM * DIM;
 
     for (int i = 0; i < DIM; i++)
       for (int j = 0; j < DIM; j++) begin
-        A1[i][j] = DATAW'(i*DIM + j + 1);
-        B[i][j] = DATAW'(i*DIM + j + 1);
+        
+        A1[i][j] = DATAW'(val1 + '1);
+        B[i][j] = DATAW'(val1 + '1);
+        val1 = val1 + 1;
 
         if(i == j) begin
             A2[i][j] = DATAW'(i + 1);
         end
+        else begin
+            A2[i][j] = DATAW'(1);
+        end
 
         A3[i][j] = DATAW'(1);
 
-        A4[i][j] = val;
-        val = val - 1;
+        
+        A4[i][j] = val4;
+        val4 = val4 - 1;
 
         A5[i][j] = DATAW'($urandom_range(100, 0));
       end
@@ -178,6 +192,7 @@ initial begin
     fork
       begin : feed_thread1
         //@(posedge clk); #1;
+        
         A = A1;
         activation = 1;
         @(posedge clk); #1;
@@ -195,7 +210,7 @@ initial begin
         @(posedge clk); #1;
         activation = 0;
         @(posedge out_skew_done);
-
+        
         A = A4;
         activation = 1;
         @(posedge clk); #1;

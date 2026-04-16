@@ -6,17 +6,14 @@ module mac_ws #(
     parameter PSUMW = 32
 )(
     input  logic                  clk,
-    input  logic                  rst_n,       // active-low synchronous reset
+    input  logic                  rst_n,    
 
-    // Weight loading (done once before the computation starts)
     input  logic signed                 load_weight,
     input  logic signed [DATAW-1:0]     weight_in,
 
-    // Activation datapath (horizontal, left → right)
     input  logic signed [DATAW-1:0]     in_a,
     output logic signed [DATAW-1:0]     out_a,
 
-    // Partial-sum datapath (vertical, top → bottom)
     input  logic signed [PSUMW-1:0]     in_psum,
     output logic signed [PSUMW-1:0]     out_psum
 );
