@@ -196,7 +196,6 @@ module top_os_tb;
 
     // --------------------------------------------------------
     // Test 1 — single tile multiply, A1 x B1
-    // For a single tile NUM_TILES=1, last_tile on first send
     // --------------------------------------------------------
     $display("[%0t] Starting Test 1: A1 x B1", $time);
     fork
@@ -210,7 +209,7 @@ module top_os_tb;
     join
     
     // --------------------------------------------------------
-    // Test 2 — identity matrix, A2 x B2
+    // Test 2 — identity matrix
     // --------------------------------------------------------
     $display("[%0t] Starting Test 2: A2 x B2 (identity)", $time);
     fork
@@ -224,7 +223,7 @@ module top_os_tb;
     join
 
     // --------------------------------------------------------
-    // Test 3 — random matrices, A3 x B3
+    // Test 3 — random matrices
     // --------------------------------------------------------
     $display("[%0t] Starting Test 3: A3 x B3 (random)", $time);
     fork
