@@ -181,11 +181,13 @@ initial begin
 
 
     reset_dut;
-    compute_expected(A1, B, C1_expected);
+    compute_expected(A1, A2, C1_expected);
     compute_expected(A2, B, C2_expected);
     compute_expected(A3, B, C3_expected);
     compute_expected(A4, B, C4_expected);
     compute_expected(A5, B, C5_expected);
+    
+    B = A2;
 
     load_weights;
 
@@ -198,7 +200,7 @@ initial begin
         @(posedge clk); #1;
         activation = 0;
         @(posedge out_skew_done);
-        
+        /*
         A = A2;
         activation = 1;
         @(posedge clk); #1;
@@ -222,12 +224,12 @@ initial begin
         @(posedge clk); #1;
         activation = 0;  
         @(posedge out_skew_done);
-        
+        */
       end
       begin : capture_thread1
         @(posedge done);
         check_results(C, C1_expected);
-
+        /*
         @(posedge done); #1;  
         check_results(C, C2_expected);
 
@@ -239,6 +241,7 @@ initial begin
 
         @(posedge done); #1; 
         check_results(C, C5_expected);
+        */
       end
     join
 

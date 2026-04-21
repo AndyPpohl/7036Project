@@ -1,0 +1,36 @@
+[*]
+[*] GTKWave Analyzer v3.3.116 (w)1999-2023 BSI
+[*] Tue Apr 21 18:10:13 2026
+[*]
+[dumpfile] "/home/andy/7036proj/VerilogTest/outputs/wave.vcd"
+[dumpfile_mtime] "Tue Apr 21 18:05:02 2026"
+[dumpfile_size] 58116
+[savefile] "/home/andy/7036proj/VerilogTest/nswaveform.gtkw"
+[timestart] 0
+[size] 1000 600
+[pos] -1 -1
+*-5.509732 25 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] TOP.
+[treeopen] TOP.top_os_tb.
+[treeopen] TOP.top_os_tb.dut.
+[treeopen] TOP.top_os_tb.dut.skewer.
+[treeopen] TOP.top_os_tb.dut.skewer.array.
+[treeopen] TOP.top_os_tb.dut.skewer.array.gen_row[0].
+[treeopen] TOP.top_os_tb.dut.skewer.array.gen_row[0].gen_col[0].
+[sst_width] 297
+[signals_width] 281
+[sst_expanded] 1
+[sst_vpaned_height] 175
+@22
+TOP.top_os_tb.dut.in_a_skew[31:0]
+TOP.top_os_tb.dut.in_w_skew[31:0]
+TOP.top_os_tb.dut.out_c_flat[511:0]
+@25
+TOP.top_os_tb.dut.skewer.array.gen_row[0].gen_col[0].mac.in_a[7:0]
+TOP.top_os_tb.dut.skewer.array.gen_row[0].gen_col[0].mac.in_w[7:0]
+TOP.top_os_tb.dut.skewer.array.gen_row[0].gen_col[0].mac.out_a[7:0]
+TOP.top_os_tb.dut.skewer.array.gen_row[0].gen_col[0].mac.out_psum[31:0]
+TOP.top_os_tb.dut.skewer.array.gen_row[0].gen_col[0].mac.out_w[7:0]
+TOP.top_os_tb.dut.skewer.array.gen_row[0].gen_col[0].mac.psum_reg[31:0]
+[pattern_trace] 1
+[pattern_trace] 0
