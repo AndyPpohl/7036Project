@@ -58,6 +58,19 @@ module weight_tile_fsm #(
 
     always_comb begin
         w_addr_wr = w_addr; // Default assignment to prevent latches, will be overridden in LOAD_WEIGHTS state
+        // Combination logic to assign load_weight if we are in the WRITE_ARRAY state
+        if (state == WRITE_ARRAY) begin
+            load_weight = 1; // Assert load weight when we are writing weights to the array
+            if(tile_col_ctr == COL_TILES - 1 && tile_row_ctr == ROW_TILES - 1) begin
+                done = 1; // Assert done signal when we are writing the last tile to the array
+            end else begin
+                done = 0; // Deassert done signal when we are not writing the last tile to the array
+            end
+        end else begin
+            load_weight = 0;
+            done = 0;
+        end
+
         for (int i = 0; i < DIM; i++) begin
             for (int j = 0; j < DIM; j++) begin
                 weight_wr[i][j] = weight_buffer[i*DIM + j];
@@ -72,8 +85,8 @@ module weight_tile_fsm #(
             mat_col_ctr <= 0;
             tile_ctr <= 0;
             w_rd_en <= 0;
-            load_weight <= 0;
-            done <= 0;
+//            load_weight <= 0;
+//            done <= 0;
             state <= IDLE;
             weight_buffer <= '{default:0}; // Clear weight buffer on reset
             w_addr <= 0; // Reset weight address counter
@@ -91,8 +104,8 @@ module weight_tile_fsm #(
                     mat_col_ctr <= 0;
                     tile_ctr <= 0;
                     w_rd_en <= 0;
-                    load_weight <= 0;
-                    done <= 0;
+//                    load_weight <= 0;
+//                    done <= 0;
                     zero_pad_en <= 0; // Disable zero padding in idle state
                     if(start) begin
                         state <= LOAD_WEIGHTS;
@@ -106,12 +119,13 @@ module weight_tile_fsm #(
                 LOAD_WEIGHTS: begin
                     // Logic to read weights from weight BRAM and load them into the PE array
                     // Logic For Addressing
+//                    load_weight <= 0; // Deassert load weight while we are still loading weights into the buffer    
                     if(mat_col_ctr == (tile_col_ctr * DIM + DIM - 1)) begin // If we've reached the end of the current tile column
                         if(mat_row_ctr == (tile_row_ctr * DIM + DIM - 1)) begin // If we've reached the end of the current tile row
                             if(tile_ctr == (DIM * DIM - 1)) begin
                                 tile_ctr <= 0; // Reset tile counter
                                 state <= WRITE_ARRAY; // Move to next state after loading weights for current tile
-                                load_weight <= 1;
+                                // load_weight <= 1;
                                 // w_rd_en <= 0; // Deassert read enable after reading all weights for the tile
                             end
                         end else begin
@@ -150,8 +164,12 @@ module weight_tile_fsm #(
                 WRITE_ARRAY: begin //Here we will load the weights and reset for next tile
                     // Logic to write weigh_buffer to weight_wr to load weights into PE array and to read input vector data from input BRAM and write it to inp_wr to feed into PE array
                      // Assert load weight signal to indicate weights are being loaded into PE array
+                    // load_weight <= 1;
+                    // if(tile_col_ctr == COL_TILES - 1 && tile_row_ctr == ROW_TILES - 1) begin
+                    //     done <= 1; // Assert done signal after writing weights for all tiles
+                    // end
                     if(out_skew_done) begin // Wait for signal from PE array that it has finished skewing the weights before loading next tile of weights
-                        load_weight <= 0;
+                        // load_weight <= 0;
                         state <= LOAD_WEIGHTS; // Go back to loading weights for next tile
                         weight_buffer <= '{default:0}; // Clear weight buffer for next tile
                         tile_ctr <= 0; // Reset tile counter for next tile
@@ -164,8 +182,9 @@ module weight_tile_fsm #(
                                 tile_row_ctr <= 0; // Reset tile row counter
                                 mat_row_ctr <= 0; // Reset matrix row counter
                                 mat_col_ctr <= 0; // Reset matrix column counter
-                                state <= DONE; // Move to compute state after writing weights for all tiles
+                                state <= IDLE; // Move to compute state after writing weights for all tiles
                                 w_rd_en <= 0; // Deassert read enable after reading all weights
+
                             end else begin // If we need to move to the next tile row
                                 tile_col_ctr <= 0; // Reset tile column counter
                                 tile_row_ctr <= tile_row_ctr + 1; // Increment tile row counter
@@ -182,11 +201,6 @@ module weight_tile_fsm #(
                     end
                 end
 
-                DONE: begin
-                    // Assert done signal
-                    done <= 1;
-                    state <= IDLE; // Go back to idle state after completion
-                end
             endcase
         end
     end

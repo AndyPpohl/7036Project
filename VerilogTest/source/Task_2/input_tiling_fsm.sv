@@ -54,9 +54,22 @@ module input_tiling_fsm #(
 
     always_comb begin
         inp_addr_wr = inp_addr; // Default assignment to prevent latches, will be overridden in load_inpS state
+
+        if(state == WRITE_ARRAY) begin
+            load_inp = 1; // Assert load weight signal to indicate we are loading weights into PE array
+            if(tile_row_ctr == ROW_TILES - 1) begin
+                done = 1; // Assert done signal when we've loaded the last tile of weights
+            end else begin
+                done = 0;
+            end            
+        end else begin
+            load_inp = 0; // Default to 0 when not in load_inp state
+            done = 0; // Default to 0 when not in done state
+        end
+
         for (int i = 0; i < DIM; i++) begin
             for (int j = 0; j < DIM; j++) begin
-                input_wr[i][j] = input_buffer[i];
+                input_wr[j][i] = input_buffer[i];
             end
         end
     end
@@ -68,8 +81,8 @@ module input_tiling_fsm #(
             // mat_col_ctr <= 0;
             tile_ctr <= 0;
             inp_rd_en <= 0;
-            load_inp <= 0;
-            done <= 0;
+            // load_inp <= 0;
+            // done <= 0;
             state <= IDLE;
             input_buffer <= '{default:0}; // Clear weight buffer on reset
             inp_addr <= 0; // Reset weight address counter
@@ -82,13 +95,11 @@ module input_tiling_fsm #(
             case (state)
                 IDLE: begin
                     tile_row_ctr <= 0;
-                    // tile_col_ctr <= 0;
                     mat_row_ctr <= 0;
-                    // mat_col_ctr <= 0;
                     tile_ctr <= 0;
                     inp_rd_en <= 0;
-                    load_inp <= 0;
-                    done <= 0;
+                    // load_inp <= 0;
+                    // done <= 0;
                     zero_pad_en <= 0; // Disable zero padding in idle state
                     if(start) begin
                         state <= LOAD_INP;
@@ -105,7 +116,7 @@ module input_tiling_fsm #(
                         if(tile_ctr == TILE_SIZE-1) begin // If we've loaded all weights for the current tile
                             tile_ctr <= 0; // Reset tile counter
                             state <= WRITE_ARRAY; // Move to next state after loading weights for current tile
-                            load_inp <= 1; 
+                            // load_inp <= 1; 
                         end
                     end else begin
                         mat_row_ctr <= mat_row_ctr + 1; // Increment row counter
@@ -139,7 +150,7 @@ module input_tiling_fsm #(
                     // Logic to write weigh_buffer to input_wr to load weights into PE array and to read input vector data from input BRAM and write it to inp_wr to feed into PE array
                      // Assert load weight signal to indicate weights are being loaded into PE array
                     if(out_skew_done) begin // Wait for signal from PE array that it has finished skewing the weights before loading next tile of weights
-                        load_inp <= 0;
+                        // load_inp <= 0;
                         state <= LOAD_INP; // Go back to loading weights for next tile
                         input_buffer <= '{default:0}; // Clear weight buffer for next tile
                         tile_ctr <= 0; // Reset tile counter for next tile
@@ -149,7 +160,7 @@ module input_tiling_fsm #(
                         if(tile_row_ctr == ROW_TILES - 1) begin // If we've reached the end of all the weights
                             tile_row_ctr <= 0; // Reset tile row counter
                             mat_row_ctr <= 0; // Reset matrix row counter
-                            state <= DONE; // Move to compute state after writing weights for all tiles
+                            state <= IDLE; // Move to compute state after writing weights for all tiles
                             inp_rd_en <= 0; // Deassert read enable after reading all weights
                         end else begin // If we need to move to the next tile row
                             tile_row_ctr <= tile_row_ctr + 1; // Increment tile row counter
@@ -158,11 +169,6 @@ module input_tiling_fsm #(
                     end
                 end
 
-                DONE: begin
-                    // Assert done signal
-                    done <= 1;
-                    state <= IDLE; // Go back to idle state after completion
-                end
             endcase
         end
     end

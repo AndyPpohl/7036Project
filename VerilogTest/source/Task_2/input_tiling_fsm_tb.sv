@@ -128,25 +128,45 @@ module input_tiling_fsm_tb;
     end
 
     // ── Checker - prints input_wr when load_input is asserted ───────────
-    always @(posedge clk) begin
+//    always @(posedge clk) begin
 
-//        out_skew_done <= out_skew_sr[1];
-        if (load_input) begin
-//            out_skew_sr <= {out_skew_sr[0], 1}; // Ensure out_skew_done is low at start
-            out_skew_done <= 1;
-            $display("--- load_input asserted --- input_wr:");
-            for (int i = 0; i < DIM; i++) begin
-                for (int j = 0; j < DIM; j++) begin
-                    $write("  input_wr[%0d][%0d] = %0d", i, j, input_wr[i][j]);
-                end
-                $write("\n");
+////        out_skew_done <= out_skew_sr[1];
+//        if (load_input) begin
+////            out_skew_sr <= {out_skew_sr[0], 1}; // Ensure out_skew_done is low at start
+//            out_skew_done <= 1;
+//            $display("--- load_input asserted --- input_wr:");
+//            for (int i = 0; i < DIM; i++) begin
+//                for (int j = 0; j < DIM; j++) begin
+//                    $write("  input_wr[%0d][%0d] = %0d", i, j, input_wr[i][j]);
+//                end
+//                $write("\n");
+//            end
+//        end else begin
+//            out_skew_done <= 0; // Deassert out_skew_done when not loading weights
+////              out_skew_sr <= {out_skew_sr[0], 0};
+//        end
+//    end
+
+logic load_weight_d;
+
+always_ff @(posedge clk) begin
+    load_weight_d <= load_input;  // 1 cycle delay
+end
+
+always_ff @(posedge clk) begin
+    if (load_weight_d) begin
+        out_skew_done <= 1;
+        $display("--- load_weight asserted (delayed) --- weight_wr:");
+        for (int i = 0; i < DIM; i++) begin
+            for (int j = 0; j < DIM; j++) begin
+                $write("  weight_wr[%0d][%0d] = %0d", i, j, input_wr[i][j]);
             end
-        end else begin
-            out_skew_done <= 0; // Deassert out_skew_done when not loading weights
-//              out_skew_sr <= {out_skew_sr[0], 0};
+            $write("\n");
         end
+    end else begin
+        out_skew_done <= 0;
     end
-
+end
     // ── Timeout guard ──────────────────────────────────────────────────────
     initial begin
         #10000;

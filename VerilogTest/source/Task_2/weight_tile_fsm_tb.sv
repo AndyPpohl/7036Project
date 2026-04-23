@@ -130,20 +130,26 @@ module weight_tile_fsm_tb;
     end
 
     // ── Checker - prints weight_wr when load_weight is asserted ───────────
-    always @(posedge clk) begin
-        if (load_weight) begin
-            out_skew_done = 1; // Ensure out_skew_done is low at start
-            $display("--- load_weight asserted --- weight_wr:");
-            for (int i = 0; i < DIM; i++) begin
-                for (int j = 0; j < DIM; j++) begin
-                    $write("  weight_wr[%0d][%0d] = %0d", i, j, weight_wr[i][j]);
-                end
-                $write("\n");
+logic load_weight_d;
+
+always_ff @(posedge clk) begin
+    load_weight_d <= load_weight;  // 1 cycle delay
+end
+
+always_ff @(posedge clk) begin
+    if (load_weight_d) begin
+        out_skew_done <= 1;
+        $display("--- load_weight asserted (delayed) --- weight_wr:");
+        for (int i = 0; i < DIM; i++) begin
+            for (int j = 0; j < DIM; j++) begin
+                $write("  weight_wr[%0d][%0d] = %0d", i, j, weight_wr[i][j]);
             end
-        end else begin
-            out_skew_done = 0; // Deassert out_skew_done when not loading weights
+            $write("\n");
         end
+    end else begin
+        out_skew_done <= 0;
     end
+end
 
     // ── Timeout guard ──────────────────────────────────────────────────────
     initial begin
