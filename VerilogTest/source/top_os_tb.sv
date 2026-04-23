@@ -62,13 +62,23 @@ module top_os_tb;
     input logic                    is_last
   );
   begin
+    integer r, c;
+
     A          = A_tile;
     B          = B_tile;
     activation = 1'b1;
     last_tile  = is_last;
     @(posedge clk); #1;
+
+    for (r = 0; r < DIM; r++) begin
+        for (c = 0; c < DIM; c++) begin
+          A[r][c] = '0;
+          B[r][c] = '0;
+        end
+    end
     activation = 1'b0;
     last_tile  = 1'b0;
+
     @(posedge out_skew_done);
   end
   endtask

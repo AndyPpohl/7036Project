@@ -29,7 +29,7 @@ module top_os #(
     logic drain;
     logic last_tile_seen;
 
-    integer r;
+    integer r, c;
 
     // ============================================================
     // Set up the skewer
@@ -60,6 +60,9 @@ module top_os #(
     logic [31:0] k;
     logic streaming;
 
+    logic signed [DATAW-1:0] A_reg [0:DIM-1][0:DIM-1];
+    logic signed [DATAW-1:0] B_reg [0:DIM-1][0:DIM-1];
+
 
     localparam PIPE_DEPTH = 2 * DIM - 1;
     logic [$clog2(PIPE_DEPTH+1)-1:0] drain_ctr;
@@ -78,6 +81,13 @@ module top_os #(
             last_tile_seen <= 1'b0;
             drain_ctr      <= '0;
             drain_counting <= 1'b0;
+
+            for (r = 0; r < DIM; r++) begin
+                for(c = 0; c < DIM; c++) begin
+                    A_reg[r][c] <= DATAW'(0);
+                    B_reg[r][c] <= DATAW'(0);
+                end
+            end
         end 
         else begin
             skew_start    <= 1'b0;
@@ -112,6 +122,8 @@ module top_os #(
                     streaming  <= 1'b1;
                     k          <= 1;
                     skew_start <= 1'b1;
+                    A_reg <= A;
+                    B_reg <= B;
 
                     if (last_tile) begin
                         last_tile_seen <= 1'b1;
@@ -124,12 +136,13 @@ module top_os #(
                 else begin
                     in_a_skew <= '0;
                     in_w_skew <= '0;
+
                 end
             end 
             else begin
                 for (r = 0; r < DIM; r++) begin
-                    in_a_skew[(r+1)*DATAW-1 -: DATAW] <= A[r][k];
-                    in_w_skew[(r+1)*DATAW-1 -: DATAW] <= B[k][r];
+                    in_a_skew[(r+1)*DATAW-1 -: DATAW] <= A_reg[r][k];
+                    in_w_skew[(r+1)*DATAW-1 -: DATAW] <= B_reg[k][r];
                 end
 
                 if (k == DIM-1) begin
