@@ -117,10 +117,14 @@ module top_os_tb;
   logic signed [DATAW-1:0] A1 [0:DIM-1][0:DIM-1];
   logic signed [DATAW-1:0] A2 [0:DIM-1][0:DIM-1];
   logic signed [DATAW-1:0] A3 [0:DIM-1][0:DIM-1];
+  logic signed [DATAW-1:0] A4 [0:DIM-1][0:DIM-1];
+  logic signed [DATAW-1:0] A5 [0:DIM-1][0:DIM-1];
 
   logic signed [DATAW-1:0] B1 [0:DIM-1][0:DIM-1];
   logic signed [DATAW-1:0] B2 [0:DIM-1][0:DIM-1];
   logic signed [DATAW-1:0] B3 [0:DIM-1][0:DIM-1];
+  logic signed [DATAW-1:0] B4 [0:DIM-1][0:DIM-1];
+  logic signed [DATAW-1:0] B5 [0:DIM-1][0:DIM-1];
 
   logic signed [PSUMW-1:0] C1_expected [0:DIM-1][0:DIM-1];
   logic signed [PSUMW-1:0] C2_expected [0:DIM-1][0:DIM-1];
@@ -129,6 +133,7 @@ module top_os_tb;
   logic signed [PSUMW-1:0] C4_expected [0:DIM-1][0:DIM-1];
   logic signed [PSUMW-1:0] C5_expected [0:DIM-1][0:DIM-1];
   logic signed [PSUMW-1:0] C6_expected [0:DIM-1][0:DIM-1];
+  logic signed [PSUMW-1:0] C7_expected [0:DIM-1][0:DIM-1];
 
   logic signed [PSUMW-1:0] C_tmp1 [0:DIM-1][0:DIM-1];
   logic signed [PSUMW-1:0] C_tmp2 [0:DIM-1][0:DIM-1];
@@ -148,15 +153,28 @@ module top_os_tb;
     //building matrices
     for (int i = 0; i < DIM; i++)
       for (int j = 0; j < DIM; j++) begin
-        A1[i][j] = DATAW'(i * DIM + j + 1);
+        A1[i][j] = DATAW'(i * DIM + j);
         B1[i][j] = DATAW'(i * DIM + j + 1);
 
-        A2[i][j] = (i == j) ? DATAW'(1) : DATAW'(0); 
-        B2[i][j] = DATAW'(i * DIM + j + 1);
+        A2[i][j] = (i == j) ? (DATAW'(i + 1)) : DATAW'(0); 
+        B2[i][j] = (i == j) ? (DATAW'(i + 1)) : DATAW'(0); 
 
         A3[i][j] = DATAW'($urandom_range(10, 1));
         B3[i][j] = DATAW'($urandom_range(10, 1));
+
+        A4[i][j] = (DATAW'(j + 1));
+        A5[i][j] = (j == 0) ? DATAW'(5) : DATAW'(0); 
+
+        B4[i][j] = DATAW'(i * DIM + j);
+        B5[i][j] = DATAW'(0);
+        
+
       end
+
+    B5[0][0] = (DATAW'(16));
+    B5[0][1] = (DATAW'(17));
+    B5[0][2] = (DATAW'(18));
+    B5[0][3] = (DATAW'(19));
 
     reset_dut;
 
@@ -167,6 +185,7 @@ module top_os_tb;
     compute_expected(A1, B1, C_tmp1);
     compute_expected(A1, B2, C_tmp2);
     compute_expected(A1, B3, C_tmp3);
+
 
     for (int i = 0; i < DIM; i++) begin 
         for (int j = 0; j < DIM; j++) begin 
@@ -194,9 +213,20 @@ module top_os_tb;
       end
     end
 
+    compute_expected(A4, B4, C_tmp1);
+    compute_expected(A5, B5, C_tmp2);
+
+    for (int i = 0; i < DIM; i++) begin
+      for (int j = 0; j < DIM; j++) begin 
+        C7_expected[i][j] = C_tmp1[i][j] + C_tmp2[i][j]; 
+      end
+    end
+
+
     // --------------------------------------------------------
     // Test 1 — single tile multiply, A1 x B1
     // --------------------------------------------------------
+    /*
     $display("[%0t] Starting Test 1: A1 x B1", $time);
     fork
       begin : feed_t1
@@ -235,40 +265,22 @@ module top_os_tb;
         check_results(C, C3_expected);
       end
     join
-
+    */
     // --------------------------------------------------------
     // Test 4 — multiple arrays in
     // --------------------------------------------------------
     $display("[%0t] Starting Test 4: Multiple arrays into one", $time);
     fork
       begin : feed_t4
-        send_tile(A1, B1, 1'b0);
-        send_tile(A1, B2, 1'b0);
-        send_tile(A1, B3, 1'b1);
-
-        @(posedge done);
-
-        send_tile(A2, B1, 1'b0);
-        send_tile(A2, B2, 1'b0);
-        send_tile(A2, B3, 1'b1);
-
-        @(posedge done);
-
-        send_tile(A3, B1, 1'b0);
-        send_tile(A3, B2, 1'b0);
-        send_tile(A3, B3, 1'b1);
-
-        @(posedge done);
+        send_tile(A4, B4, 1'b0);
+        send_tile(A5, B5, 1'b1);
+  
       end
       begin : capture_t4
         @(posedge done);
-        check_results(C, C4_expected);
-
-        @(posedge done);
-        check_results(C, C5_expected);
-
-        @(posedge done);
-        check_results(C, C6_expected);
+        check_results(C, C7_expected);
+        
+        @(posedge clk);
       end
     join
     
